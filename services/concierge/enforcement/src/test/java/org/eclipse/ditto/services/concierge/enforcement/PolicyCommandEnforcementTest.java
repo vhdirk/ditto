@@ -55,8 +55,8 @@ import org.eclipse.ditto.services.models.policies.commands.sudo.SudoRetrievePoli
 import org.eclipse.ditto.services.utils.cache.Cache;
 import org.eclipse.ditto.services.utils.cache.CaffeineCache;
 import org.eclipse.ditto.services.utils.cache.EntityIdWithResourceType;
-import org.eclipse.ditto.services.utils.cache.PolicyCacheLoader;
 import org.eclipse.ditto.services.utils.cache.entry.Entry;
+import org.eclipse.ditto.services.utils.cacheloaders.PolicyCacheLoader;
 import org.eclipse.ditto.services.utils.cacheloaders.PolicyEnforcer;
 import org.eclipse.ditto.services.utils.cacheloaders.PolicyEnforcerCacheLoader;
 import org.eclipse.ditto.signals.commands.policies.PolicyCommand;
@@ -145,7 +145,7 @@ public final class PolicyCommandEnforcementTest {
 
     private ActorSystem system;
     private TestProbe policiesShardRegionProbe;
-    private Cache<EntityId, Entry<Policy>> policyCache;
+    private Cache<EntityIdWithResourceType, Entry<Policy>> policyCache;
     private Cache<EntityIdWithResourceType, Entry<PolicyEnforcer>> enforcerCache;
     private ActorRef enforcer;
 

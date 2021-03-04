@@ -888,7 +888,7 @@ public final class ThingCommandEnforcement
 
         final boolean authorized;
         if (command instanceof MergeThing) {
-            // TODO DVH merge commands
+            // TODO DVH: merge commands
             authorized = enforceMergeThingCommand(policyEnforcer, (MergeThing) command, thingResourceKey,
                     authorizationContext);
 
@@ -909,6 +909,7 @@ public final class ThingCommandEnforcement
                     return keys.allMatch(key -> policyEnforcer.hasUnrestrictedPermissions(key, authorizationContext, permission));
                 }).isPresent();
         } else {
+            // TODO: DVH: Do I need to traverse the policy here for read perms as well?
             authorized = policyEnforcer.hasPartialPermissions(thingResourceKey, authorizationContext, Permission.READ);
         }
 
