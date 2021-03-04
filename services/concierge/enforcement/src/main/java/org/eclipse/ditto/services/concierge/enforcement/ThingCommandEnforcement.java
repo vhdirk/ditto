@@ -54,8 +54,10 @@ import org.eclipse.ditto.model.policies.Permissions;
 import org.eclipse.ditto.model.policies.PoliciesModelFactory;
 import org.eclipse.ditto.model.policies.PoliciesResourceType;
 import org.eclipse.ditto.model.policies.Policy;
+import org.eclipse.ditto.model.policies.PolicyEntry;
 import org.eclipse.ditto.model.policies.PolicyException;
 import org.eclipse.ditto.model.policies.PolicyId;
+import org.eclipse.ditto.model.policies.PolicyImportHelper;
 import org.eclipse.ditto.model.policies.ResourceKey;
 import org.eclipse.ditto.model.policies.Subject;
 import org.eclipse.ditto.model.policies.SubjectId;
@@ -886,25 +888,26 @@ public final class ThingCommandEnforcement
 
         final boolean authorized;
         if (command instanceof MergeThing) {
+            // TODO DVH merge commands
             authorized = enforceMergeThingCommand(policyEnforcer, (MergeThing) command, thingResourceKey,
                     authorizationContext);
-            // TODO TJ merge commands
+
         } else if (command instanceof ThingModifyCommand) {
-            authorized = ((ThingModifyCommand) command).getEntity()
-                    .filter(JsonValue::isObject)
-                    .map(JsonValue::asObject)
-                    .map(policyJsonObj -> policyJsonObj.stream()
-                            .filter(f -> !f.getValue().isNull())
-                            .map(JsonField::getKey)
-                            .map(JsonKey::toString))
-                    .map(keys -> keys.map(key ->
-                            PoliciesResourceType.thingResource(command.getResourcePath().append(JsonPointer.of(key)))))
-                    .filter(keys -> keys.allMatch(key ->
-                            policyEnforcer.hasUnrestrictedPermissions(key, authorizationContext, permission))
-                    ).isPresent();
-                    Permission.WRITE);
-            // TODO TJ on master:
-            // authorized = policyEnforcer.hasUnrestrictedPermissions(thingResourceKey, authorizationContext, Permission.WRITE)
+            final String permission = Permission.WRITE;
+            final ThingModifyCommand<?> modifyCommand = (ThingModifyCommand<?>) command;
+            authorized = modifyCommand.getEntity()
+                .filter(JsonValue::isObject)
+                .map(JsonValue::asObject)
+                .map(policyJsonObj -> {
+                    return policyJsonObj.stream()
+                        .filter(f -> !f.getValue().isNull())
+                        .map(f -> f.getKey())
+                        .map(k -> k.toString());
+                }).map(keys -> {
+                    return keys.map(key -> PoliciesResourceType.thingResource(command.getResourcePath().append(JsonPointer.of(key))));
+                }).filter(keys -> {
+                    return keys.allMatch(key -> policyEnforcer.hasUnrestrictedPermissions(key, authorizationContext, permission));
+                }).isPresent();
         } else {
             authorized = policyEnforcer.hasPartialPermissions(thingResourceKey, authorizationContext, Permission.READ);
         }
