@@ -26,6 +26,7 @@ import org.eclipse.ditto.json.JsonObjectBuilder;
 import org.eclipse.ditto.json.JsonPointer;
 import org.eclipse.ditto.model.base.headers.DittoHeaders;
 import org.eclipse.ditto.model.base.json.FieldType;
+import org.eclipse.ditto.model.base.json.JsonParsableCommand;
 import org.eclipse.ditto.model.base.json.JsonSchemaVersion;
 import org.eclipse.ditto.model.policies.PolicyId;
 import org.eclipse.ditto.signals.commands.base.AbstractCommand;
@@ -35,6 +36,7 @@ import org.eclipse.ditto.signals.commands.base.CommandJsonDeserializer;
  * This command deletes a {@link org.eclipse.ditto.model.policies.PolicyImport}.
  */
 @Immutable
+@JsonParsableCommand(typePrefix = DeletePolicyImport.TYPE_PREFIX, name = DeletePolicyImport.NAME)
 public final class DeletePolicyImport extends AbstractCommand<DeletePolicyImport>
         implements PolicyModifyCommand<DeletePolicyImport> {
 

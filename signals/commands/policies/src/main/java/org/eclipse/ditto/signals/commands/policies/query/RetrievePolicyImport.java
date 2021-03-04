@@ -28,6 +28,7 @@ import org.eclipse.ditto.json.JsonObjectBuilder;
 import org.eclipse.ditto.json.JsonPointer;
 import org.eclipse.ditto.model.base.headers.DittoHeaders;
 import org.eclipse.ditto.model.base.json.FieldType;
+import org.eclipse.ditto.model.base.json.JsonParsableCommand;
 import org.eclipse.ditto.model.base.json.JsonSchemaVersion;
 import org.eclipse.ditto.model.policies.PolicyId;
 import org.eclipse.ditto.signals.commands.base.AbstractCommand;
@@ -38,6 +39,7 @@ import org.eclipse.ditto.signals.commands.base.CommandJsonDeserializer;
  * ID.
  */
 @Immutable
+@JsonParsableCommand(typePrefix = RetrievePolicyImport.TYPE_PREFIX, name = RetrievePolicyImport.NAME)
 public final class RetrievePolicyImport extends AbstractCommand<RetrievePolicyImport> implements
         PolicyQueryCommand<RetrievePolicyImport> {
 

@@ -30,6 +30,7 @@ import org.eclipse.ditto.json.JsonValue;
 import org.eclipse.ditto.model.base.common.HttpStatus;
 import org.eclipse.ditto.model.base.headers.DittoHeaders;
 import org.eclipse.ditto.model.base.json.FieldType;
+import org.eclipse.ditto.model.base.json.JsonParsableCommandResponse;
 import org.eclipse.ditto.model.base.json.JsonSchemaVersion;
 import org.eclipse.ditto.model.policies.PoliciesModelFactory;
 import org.eclipse.ditto.model.policies.PolicyId;
@@ -41,6 +42,7 @@ import org.eclipse.ditto.signals.commands.base.CommandResponseJsonDeserializer;
  * Response to a {@link RetrievePolicyImport} command.
  */
 @Immutable
+@JsonParsableCommandResponse(type = RetrievePolicyImportResponse.TYPE)
 public final class RetrievePolicyImportResponse extends AbstractCommandResponse<RetrievePolicyImportResponse> implements
         PolicyQueryCommandResponse<RetrievePolicyImportResponse> {
 
