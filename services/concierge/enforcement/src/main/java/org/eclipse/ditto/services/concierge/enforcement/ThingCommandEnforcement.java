@@ -144,7 +144,7 @@ public final class ThingCommandEnforcement
     private final EnforcerRetriever<Enforcer> policyEnforcerRetriever;
     private final Cache<EntityIdWithResourceType, Entry<EntityIdWithResourceType>> thingIdCache;
     private final Cache<EntityIdWithResourceType, Entry<Policy>> policyCache;
-    private final Cache<EntityId, Entry<Enforcer>> policyEnforcerCache;
+    private final Cache<EntityIdWithResourceType, Entry<Enforcer>> policyEnforcerCache;
     private final PreEnforcer preEnforcer;
     private final Cache<EntityIdWithResourceType, Entry<Enforcer>> aclEnforcerCache;
     private final PolicyIdReferencePlaceholderResolver policyIdReferencePlaceholderResolver;
@@ -154,7 +154,7 @@ public final class ThingCommandEnforcement
             final ActorRef policiesShardRegion,
             final Cache<EntityIdWithResourceType, Entry<EntityIdWithResourceType>> thingIdCache,
             final Cache<EntityIdWithResourceType, Entry<Policy>> policyCache,
-            final Cache<EntityId, Entry<Enforcer>> policyEnforcerCache,
+            final Cache<EntityIdWithResourceType, Entry<Enforcer>> policyEnforcerCache,
             final Cache<EntityIdWithResourceType, Entry<Enforcer>> aclEnforcerCache,
             final PreEnforcer preEnforcer,
             final List<SubjectIssuer> subjectIssuersForPolicyMigration) {
@@ -1243,6 +1243,7 @@ public final class ThingCommandEnforcement
         private final ActorRef thingsShardRegion;
         private final ActorRef policiesShardRegion;
         private final Cache<EntityIdWithResourceType, Entry<EntityIdWithResourceType>> thingIdCache;
+        private final Cache<EntityIdWithResourceType, Entry<Policy>> policyCache;
         private final Cache<EntityIdWithResourceType, Entry<Enforcer>> policyEnforcerCache;
         private final Cache<EntityIdWithResourceType, Entry<Enforcer>> aclEnforcerCache;
         private final PreEnforcer preEnforcer;
@@ -1261,11 +1262,12 @@ public final class ThingCommandEnforcement
         public Provider(final ActorRef thingsShardRegion,
                 final ActorRef policiesShardRegion,
                 final Cache<EntityIdWithResourceType, Entry<EntityIdWithResourceType>> thingIdCache,
+                final Cache<EntityIdWithResourceType, Entry<Policy>> policyCache,
                 final Cache<EntityIdWithResourceType, Entry<Enforcer>> policyEnforcerCache,
                 final Cache<EntityIdWithResourceType, Entry<Enforcer>> aclEnforcerCache,
                 @Nullable final PreEnforcer preEnforcer) {
 
-            this(thingsShardRegion, policiesShardRegion, thingIdCache, policyEnforcerCache, aclEnforcerCache,
+            this(thingsShardRegion, policiesShardRegion, thingIdCache, policyCache, policyEnforcerCache, aclEnforcerCache,
                     preEnforcer, DEFAULT_SUBJECT_ISSUERS_FOR_POLICY_MIGRATION);
         }
 
@@ -1285,6 +1287,7 @@ public final class ThingCommandEnforcement
         public Provider(final ActorRef thingsShardRegion,
                 final ActorRef policiesShardRegion,
                 final Cache<EntityIdWithResourceType, Entry<EntityIdWithResourceType>> thingIdCache,
+                final Cache<EntityIdWithResourceType, Entry<Policy>> policyCache,
                 final Cache<EntityIdWithResourceType, Entry<Enforcer>> policyEnforcerCache,
                 final Cache<EntityIdWithResourceType, Entry<Enforcer>> aclEnforcerCache,
                 @Nullable final PreEnforcer preEnforcer,
@@ -1293,6 +1296,7 @@ public final class ThingCommandEnforcement
             this.thingsShardRegion = requireNonNull(thingsShardRegion);
             this.policiesShardRegion = requireNonNull(policiesShardRegion);
             this.thingIdCache = requireNonNull(thingIdCache);
+            this.policyCache = requireNonNull(policyCache);
             this.policyEnforcerCache = requireNonNull(policyEnforcerCache);
             this.aclEnforcerCache = requireNonNull(aclEnforcerCache);
             this.preEnforcer = Optional.ofNullable(preEnforcer).orElse(CompletableFuture::completedFuture);
@@ -1320,7 +1324,7 @@ public final class ThingCommandEnforcement
         @Override
         public AbstractEnforcement<ThingCommand<?>> createEnforcement(final Contextual<ThingCommand<?>> context) {
             return new ThingCommandEnforcement(context, thingsShardRegion, policiesShardRegion, thingIdCache,
-                    policyEnforcerCache, aclEnforcerCache, preEnforcer, subjectIssuersForPolicyMigration);
+                    policyCache, policyEnforcerCache, aclEnforcerCache, preEnforcer, subjectIssuersForPolicyMigration);
         }
 
     }

@@ -25,6 +25,7 @@ import org.eclipse.ditto.json.JsonFactory;
 import org.eclipse.ditto.json.JsonFieldSelector;
 import org.eclipse.ditto.json.JsonKey;
 import org.eclipse.ditto.json.JsonObject;
+import org.eclipse.ditto.json.JsonPointer;
 import org.eclipse.ditto.json.JsonValue;
 import org.eclipse.ditto.model.base.auth.AuthorizationContext;
 import org.eclipse.ditto.model.base.entity.id.EntityId;
@@ -84,11 +85,11 @@ public final class PolicyCommandEnforcement
     private final ActorRef policiesShardRegion;
     private final EnforcerRetriever<PolicyEnforcer> enforcerRetriever;
     private final Cache<EntityIdWithResourceType, Entry<Policy>> policyCache;
-    private final Cache<EntityId, Entry<PolicyEnforcer>> enforcerCache;
+    private final Cache<EntityIdWithResourceType, Entry<PolicyEnforcer>> enforcerCache;
 
     private PolicyCommandEnforcement(final Contextual<PolicyCommand<?>> context, final ActorRef policiesShardRegion,
             final Cache<EntityIdWithResourceType, Entry<Policy>> policyCache,
-            final Cache<EntityId, Entry<PolicyEnforcer>> enforcerCache) {
+            final Cache<EntityIdWithResourceType, Entry<PolicyEnforcer>> enforcerCache) {
 
         super(context, PolicyQueryCommandResponse.class);
         this.policiesShardRegion = requireNonNull(policiesShardRegion);
@@ -123,25 +124,26 @@ public final class PolicyCommandEnforcement
             authorizedCommand =
                     authorizeActionCommand(policyEnforcer, command, policyResourceKey, authorizationContext);
         } else if (command instanceof PolicyModifyCommand) {
-            authorizedCommand = hasUnrestrictedWritePermission(enforcer, policyResourceKey, authorizationContext)
-                    ? Optional.of(command)
-                    : Optional.empty();
-            // TODO TJ policy-import-branch had:
             final String permission = Permission.WRITE;
-
-
-            authorizedCommand = ((PolicyModifyCommand<T>) command).getEntity()
+            final PolicyModifyCommand<?> modifyCommand = (PolicyModifyCommand<?>) command;
+            authorizedCommand = modifyCommand.getEntity()
                 .filter(JsonValue::isObject)
                 .map(JsonValue::asObject)
-                .map(policyJsonObj -> policyJsonObj.stream()
+                .map(policyJsonObj -> {
+                    return policyJsonObj.stream()
                         .filter(f -> !f.getValue().isNull())
-                        .map(JsonField::getKey)
-                        .map(JsonKey::toString))
-                .map(keys -> keys.map(key ->
-                        PoliciesResourceType.policyResource(command.getResourcePath().append(JsonPointer.of(key)))))
-                .filter(keys -> keys.allMatch(key ->
-                        enforcer.hasUnrestrictedPermissions(key, authorizationContext, permission))
-                ).isPresent();
+                        .map(f -> f.getKey())
+                        .map(k -> k.toString());
+                })
+                .map(keys -> {
+                    return keys.map(key -> {
+                        final JsonPointer ptr = JsonPointer.of(key);
+                        final JsonPointer rptr = command.getResourcePath().append(ptr);
+                        return PoliciesResourceType.policyResource(rptr);
+                    });
+                }).filter(keys -> {
+                    return keys.allMatch(key -> enforcer.hasUnrestrictedPermissions(key, authorizationContext, permission));
+                }).isPresent() ? Optional.of(command) : Optional.empty();
         } else {
             final String permission = Permission.READ;
             return enforcer.hasPartialPermissions(policyResourceKey, authorizationContext, permission)
@@ -405,6 +407,7 @@ public final class PolicyCommandEnforcement
     public static final class Provider implements EnforcementProvider<PolicyCommand<?>> {
 
         private final Cache<EntityIdWithResourceType, Entry<PolicyEnforcer>> enforcerCache;
+        private final Cache<EntityIdWithResourceType, Entry<Policy>> policyCache;
         private final ActorRef policiesShardRegion;
 
         /**
@@ -414,8 +417,10 @@ public final class PolicyCommandEnforcement
          * @param enforcerCache the enforcer cache.
          */
         public Provider(final ActorRef policiesShardRegion,
+                final Cache<EntityIdWithResourceType, Entry<Policy>> policyCache,
                 final Cache<EntityIdWithResourceType, Entry<PolicyEnforcer>> enforcerCache) {
             this.policiesShardRegion = requireNonNull(policiesShardRegion);
+            this.policyCache = requireNonNull(policyCache);
             this.enforcerCache = requireNonNull(enforcerCache);
         }
 
@@ -432,9 +437,7 @@ public final class PolicyCommandEnforcement
 
         @Override
         public AbstractEnforcement<PolicyCommand<?>> createEnforcement(final Contextual<PolicyCommand<?>> context) {
-            return new PolicyCommandEnforcement(context, policiesShardRegion, enforcerCache);
+            return new PolicyCommandEnforcement(context, policiesShardRegion, policyCache, enforcerCache);
         }
-
     }
-
 }
