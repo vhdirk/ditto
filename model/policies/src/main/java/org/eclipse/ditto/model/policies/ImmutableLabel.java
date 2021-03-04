@@ -28,6 +28,11 @@ import org.eclipse.ditto.model.base.entity.validation.NoControlCharactersNoSlash
 @Immutable
 final class ImmutableLabel implements Label {
 
+    /**
+     * Prefix for Policy labels which were imported. As a consequence Policy entries may not start with the prefix.
+     */
+    static final String BLACKLISTED_IMPORTED_PREFIX = "imported-";
+
     private final String labelValue;
 
     private ImmutableLabel(final String theLabelValue) {
@@ -41,9 +46,13 @@ final class ImmutableLabel implements Label {
      * @return a new Label.
      * @throws NullPointerException if {@code labelValue} is {@code null}.
      * @throws IllegalArgumentException if {@code labelValue} is empty.
+     * @throws LabelInvalidException of the {@code labelValue} can not be used to to blacklisted prefixes.
      */
     public static Label of(final CharSequence labelValue) {
         argumentNotEmpty(labelValue, "label value");
+        if (labelValue.toString().startsWith(BLACKLISTED_IMPORTED_PREFIX)) {
+            throw LabelInvalidException.newBuilder(labelValue).build();
+        }
 
         final Validator validator = NoControlCharactersNoSlashesValidator.getInstance(labelValue);
         if (!validator.isValid()) {

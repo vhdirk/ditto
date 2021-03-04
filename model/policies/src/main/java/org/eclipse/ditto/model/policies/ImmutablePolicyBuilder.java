@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Contributors to the Eclipse Foundation
+ * Copyright (c) 2021 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -37,6 +37,7 @@ final class ImmutablePolicyBuilder implements PolicyBuilder {
     @Nullable private PolicyId id;
     @Nullable private PolicyLifecycle lifecycle;
     @Nullable private PolicyRevision revision;
+    @Nullable private PolicyImports imports;
     @Nullable private Instant modified;
     @Nullable private Instant created;
 
@@ -47,6 +48,7 @@ final class ImmutablePolicyBuilder implements PolicyBuilder {
         id = null;
         lifecycle = null;
         revision = null;
+        imports = null;
         modified = null;
         created = null;
     }
@@ -108,7 +110,8 @@ final class ImmutablePolicyBuilder implements PolicyBuilder {
         final ImmutablePolicyBuilder result = new ImmutablePolicyBuilder()
                 .setLifecycle(existingPolicy.getLifecycle().orElse(null))
                 .setRevision(existingPolicy.getRevision().orElse(null))
-                .setModified(existingPolicy.getModified().orElse(null));
+                .setModified(existingPolicy.getModified().orElse(null))
+                .setImports(existingPolicy.getImports().orElse(null));
 
         existingPolicy.getEntityId().ifPresent(result::setId);
         existingPolicy.forEach(result::set);
@@ -148,6 +151,12 @@ final class ImmutablePolicyBuilder implements PolicyBuilder {
     @Override
     public ImmutablePolicyBuilder setModified(@Nullable final Instant modified) {
         this.modified = modified;
+        return this;
+    }
+
+    @Override
+    public ImmutablePolicyBuilder setImports(@Nullable final PolicyImports imports) {
+        this.imports = imports;
         return this;
     }
 
@@ -342,7 +351,7 @@ final class ImmutablePolicyBuilder implements PolicyBuilder {
                 .map(lbl -> PoliciesModelFactory.newPolicyEntry(lbl, getFinalSubjects(lbl), getFinalResources(lbl)))
                 .collect(Collectors.toList());
 
-        return ImmutablePolicy.of(id, lifecycle, revision, modified, created, policyEntries);
+        return ImmutablePolicy.of(id, lifecycle, revision, modified, created, imports, policyEntries);
     }
 
     @Nonnull
