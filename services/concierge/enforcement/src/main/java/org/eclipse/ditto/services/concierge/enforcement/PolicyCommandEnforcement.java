@@ -16,6 +16,7 @@ import static java.util.Objects.requireNonNull;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.stream.Collectors;
@@ -26,6 +27,7 @@ import org.eclipse.ditto.json.JsonKey;
 import org.eclipse.ditto.json.JsonObject;
 import org.eclipse.ditto.json.JsonValue;
 import org.eclipse.ditto.model.base.auth.AuthorizationContext;
+import org.eclipse.ditto.model.base.entity.id.EntityId;
 import org.eclipse.ditto.model.base.exceptions.DittoRuntimeException;
 import org.eclipse.ditto.model.base.headers.DittoHeaderDefinition;
 import org.eclipse.ditto.model.base.headers.DittoHeaders;
@@ -38,6 +40,7 @@ import org.eclipse.ditto.model.policies.PoliciesResourceType;
 import org.eclipse.ditto.model.policies.Policy;
 import org.eclipse.ditto.model.policies.PolicyEntry;
 import org.eclipse.ditto.model.policies.PolicyId;
+import org.eclipse.ditto.model.policies.PolicyImportHelper;
 import org.eclipse.ditto.model.policies.ResourceKey;
 import org.eclipse.ditto.services.models.concierge.ConciergeMessagingConstants;
 import org.eclipse.ditto.services.models.policies.Permission;
@@ -80,13 +83,16 @@ public final class PolicyCommandEnforcement
 
     private final ActorRef policiesShardRegion;
     private final EnforcerRetriever<PolicyEnforcer> enforcerRetriever;
-    private final Cache<EntityIdWithResourceType, Entry<PolicyEnforcer>> enforcerCache;
+    private final Cache<EntityIdWithResourceType, Entry<Policy>> policyCache;
+    private final Cache<EntityId, Entry<PolicyEnforcer>> enforcerCache;
 
     private PolicyCommandEnforcement(final Contextual<PolicyCommand<?>> context, final ActorRef policiesShardRegion,
-            final Cache<EntityIdWithResourceType, Entry<PolicyEnforcer>> enforcerCache) {
+            final Cache<EntityIdWithResourceType, Entry<Policy>> policyCache,
+            final Cache<EntityId, Entry<PolicyEnforcer>> enforcerCache) {
 
         super(context, PolicyQueryCommandResponse.class);
         this.policiesShardRegion = requireNonNull(policiesShardRegion);
+        this.policyCache = requireNonNull(policyCache);
         this.enforcerCache = requireNonNull(enforcerCache);
         enforcerRetriever = new EnforcerRetriever<>(IdentityCache.INSTANCE, enforcerCache);
     }
@@ -120,6 +126,22 @@ public final class PolicyCommandEnforcement
             authorizedCommand = hasUnrestrictedWritePermission(enforcer, policyResourceKey, authorizationContext)
                     ? Optional.of(command)
                     : Optional.empty();
+            // TODO TJ policy-import-branch had:
+            final String permission = Permission.WRITE;
+
+
+            authorizedCommand = ((PolicyModifyCommand<T>) command).getEntity()
+                .filter(JsonValue::isObject)
+                .map(JsonValue::asObject)
+                .map(policyJsonObj -> policyJsonObj.stream()
+                        .filter(f -> !f.getValue().isNull())
+                        .map(JsonField::getKey)
+                        .map(JsonKey::toString))
+                .map(keys -> keys.map(key ->
+                        PoliciesResourceType.policyResource(command.getResourcePath().append(JsonPointer.of(key)))))
+                .filter(keys -> keys.allMatch(key ->
+                        enforcer.hasUnrestrictedPermissions(key, authorizationContext, permission))
+                ).isPresent();
         } else {
             final String permission = Permission.READ;
             return enforcer.hasPartialPermissions(policyResourceKey, authorizationContext, permission)
@@ -284,7 +306,9 @@ public final class PolicyCommandEnforcement
         final PolicyCommand<?> policyCommand = transformModifyPolicyToCreatePolicy(signal());
         if (policyCommand instanceof CreatePolicy) {
             final CreatePolicy createPolicy = (CreatePolicy) policyCommand;
-            final Enforcer enforcer = PolicyEnforcers.defaultEvaluator(createPolicy.getPolicy());
+            final Set<PolicyEntry> mergedPolicyEntriesSet =
+                    PolicyImportHelper.mergeImportedPolicyEntries(createPolicy.getPolicy(), this::policyLoader);
+            final Enforcer enforcer = PolicyEnforcers.defaultEvaluator(mergedPolicyEntriesSet);
             final Optional<CreatePolicy> authorizedCommand =
                     authorizePolicyCommand(createPolicy, PolicyEnforcer.of(enforcer));
             if (authorizedCommand.isPresent()) {
@@ -297,6 +321,12 @@ public final class PolicyCommandEnforcement
                     .dittoHeaders(policyCommand.getDittoHeaders())
                     .build();
         }
+    }
+
+    private Optional<Policy> policyLoader(final PolicyId policyId) {
+        return policyCache.getBlocking(EntityIdWithResourceType.of(PolicyCommand.RESOURCE_TYPE, policyId))
+                .filter(Entry::exists)
+                .map(Entry::getValueOrThrow);
     }
 
     /**
@@ -328,6 +358,7 @@ public final class PolicyCommandEnforcement
      */
     private void invalidateCaches(final PolicyId policyId) {
         final EntityIdWithResourceType entityId = EntityIdWithResourceType.of(PolicyCommand.RESOURCE_TYPE, policyId);
+        policyCache.invalidate(entityId);
         enforcerCache.invalidate(entityId);
         pubSubMediator().tell(DistPubSubAccess.sendToAll(
                 ConciergeMessagingConstants.ENFORCER_ACTOR_PATH,

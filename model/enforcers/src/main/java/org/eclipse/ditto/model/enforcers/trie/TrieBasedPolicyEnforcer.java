@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Contributors to the Eclipse Foundation
+ * Copyright (c) 2021 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -26,7 +26,6 @@ import org.eclipse.ditto.model.enforcers.EffectedSubjectIds;
 import org.eclipse.ditto.model.enforcers.EffectedSubjects;
 import org.eclipse.ditto.model.enforcers.Enforcer;
 import org.eclipse.ditto.model.policies.Permissions;
-import org.eclipse.ditto.model.policies.Policy;
 import org.eclipse.ditto.model.policies.PolicyEntry;
 import org.eclipse.ditto.model.policies.ResourceKey;
 
@@ -100,12 +99,12 @@ public final class TrieBasedPolicyEnforcer implements Enforcer {
     /**
      * Constructs a trie-based policy enforcer from a policy.
      *
-     * @param policy The policy to interpret.
+     * @param policyEntries The policyEntries to interpret.
      * @return The policy enforcer.
      * @throws NullPointerException if {@code policy} is {@code null}.
      */
-    public static TrieBasedPolicyEnforcer newInstance(final Policy policy) {
-        return new TrieBasedPolicyEnforcer(checkNotNull(policy, "policy to interpret"));
+    public static TrieBasedPolicyEnforcer newInstance(final Iterable<PolicyEntry> policyEntries) {
+        return new TrieBasedPolicyEnforcer(checkNotNull(policyEntries, "policy to interpret"));
     }
 
     /**

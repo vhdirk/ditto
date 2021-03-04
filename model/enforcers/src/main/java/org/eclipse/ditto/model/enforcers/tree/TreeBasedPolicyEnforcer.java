@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Contributors to the Eclipse Foundation
+ * Copyright (c) 2021 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -44,7 +44,6 @@ import org.eclipse.ditto.model.enforcers.EffectedSubjects;
 import org.eclipse.ditto.model.enforcers.Enforcer;
 import org.eclipse.ditto.model.policies.EffectedPermissions;
 import org.eclipse.ditto.model.policies.Permissions;
-import org.eclipse.ditto.model.policies.Policy;
 import org.eclipse.ditto.model.policies.PolicyEntry;
 import org.eclipse.ditto.model.policies.Resource;
 import org.eclipse.ditto.model.policies.ResourceKey;
@@ -72,15 +71,14 @@ public final class TreeBasedPolicyEnforcer implements Enforcer {
     /**
      * Creates a new policy tree for execution of policy checks.
      *
-     * @param policy the policy to create a tree for
+     * @param policyEntries the policyEntries to create a tree for
      * @return the generated {@code TreeBasedPolicyEnforcer}
      * @throws NullPointerException if {@code policy} is {@code null}.
      */
-    public static TreeBasedPolicyEnforcer createInstance(final Policy policy) {
-        checkNotNull(policy, "policy");
+    public static TreeBasedPolicyEnforcer createInstance(final Iterable<PolicyEntry> policyEntries) {
+        checkNotNull(policyEntries, "policy");
         final Map<String, PolicyTreeNode> tree = new HashMap<>();
 
-        final Set<PolicyEntry> policyEntries = policy.getEntriesSet();
         policyEntries.forEach(policyEntry -> {
 
             final Subjects subjects = policyEntry.getSubjects();

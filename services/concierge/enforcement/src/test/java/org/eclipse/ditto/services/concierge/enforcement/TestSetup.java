@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Contributors to the Eclipse Foundation
+ * Copyright (c) 2021 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -26,9 +26,11 @@ import javax.annotation.Nullable;
 import org.eclipse.ditto.model.base.auth.AuthorizationContext;
 import org.eclipse.ditto.model.base.auth.AuthorizationSubject;
 import org.eclipse.ditto.model.base.auth.DittoAuthorizationContextType;
+import org.eclipse.ditto.model.base.entity.id.EntityId;
 import org.eclipse.ditto.model.base.headers.DittoHeaders;
 import org.eclipse.ditto.model.base.json.JsonSchemaVersion;
 import org.eclipse.ditto.model.enforcers.Enforcer;
+import org.eclipse.ditto.model.policies.Policy;
 import org.eclipse.ditto.model.things.Feature;
 import org.eclipse.ditto.model.things.ThingBuilder;
 import org.eclipse.ditto.model.things.ThingId;
@@ -37,6 +39,7 @@ import org.eclipse.ditto.services.concierge.common.CachesConfig;
 import org.eclipse.ditto.services.concierge.common.DefaultCachesConfig;
 import org.eclipse.ditto.services.utils.cache.Cache;
 import org.eclipse.ditto.services.utils.cache.CaffeineCache;
+import org.eclipse.ditto.services.utils.cache.PolicyCacheLoader;
 import org.eclipse.ditto.services.utils.cache.EntityIdWithResourceType;
 import org.eclipse.ditto.services.utils.cache.entry.Entry;
 import org.eclipse.ditto.services.utils.cacheloaders.AclEnforcerCacheLoader;
@@ -81,8 +84,8 @@ public final class TestSetup {
 
     static {
         final DefaultScopedConfig dittoScopedConfig = DefaultScopedConfig.dittoScoped(RAW_CONFIG);
-        final DefaultScopedConfig conciergeScopedConfig =
-                DefaultScopedConfig.newInstance(dittoScopedConfig, "concierge");
+        final DefaultScopedConfig conciergeScopedConfig = DefaultScopedConfig.newInstance(dittoScopedConfig,
+                "concierge");
 
         CACHES_CONFIG = DefaultCachesConfig.of(conciergeScopedConfig);
     }
@@ -93,20 +96,16 @@ public final class TestSetup {
         return new EnforcerActorBuilder(system, testActorRef, mockEntitiesActor).build();
     }
 
-    public static ActorRef newEnforcerActor(final ActorSystem system,
-            final ActorRef testActorRef,
-            final ActorRef mockEntitiesActor,
-            @Nullable final PreEnforcer preEnforcer) {
+    public static ActorRef newEnforcerActor(final ActorSystem system, final ActorRef testActorRef,
+            final ActorRef mockEntitiesActor, @Nullable final PreEnforcer preEnforcer) {
         return new EnforcerActorBuilder(system, testActorRef, mockEntitiesActor).setPreEnforcer(preEnforcer).build();
     }
 
-    public static ActorRef newEnforcerActor(final ActorSystem system,
-            final ActorRef testActorRef,
-            final ActorRef thingsShardRegion,
-            final ActorRef policiesShardRegion,
+    public static ActorRef newEnforcerActor(final ActorSystem system, final ActorRef testActorRef,
+            final ActorRef thingsShardRegion, final ActorRef policiesShardRegion,
             @Nullable final PreEnforcer preEnforcer) {
-        return new EnforcerActorBuilder(system, testActorRef, thingsShardRegion, policiesShardRegion).setPreEnforcer(
-                preEnforcer).build();
+        return new EnforcerActorBuilder(system, testActorRef, thingsShardRegion, policiesShardRegion)
+                .setPreEnforcer(preEnforcer).build();
     }
 
     static class EnforcerActorBuilder {
@@ -115,19 +114,20 @@ public final class TestSetup {
         private final ActorRef testActorRef;
         private final ActorRef thingsShardRegion;
         private final ActorRef policiesShardRegion;
-        @Nullable private ActorRef conciergeForwarder;
-        @Nullable private PreEnforcer preEnforcer;
+        @Nullable
+        private ActorRef conciergeForwarder;
+        @Nullable
+        private PreEnforcer preEnforcer;
 
-        EnforcerActorBuilder(final ActorSystem system, final ActorRef testActorRef,
-                final ActorRef mockEntityActors) {
+        EnforcerActorBuilder(final ActorSystem system, final ActorRef testActorRef, final ActorRef mockEntityActors) {
             this.system = system;
             this.testActorRef = testActorRef;
             this.thingsShardRegion = mockEntityActors;
             this.policiesShardRegion = mockEntityActors;
         }
 
-        EnforcerActorBuilder(final ActorSystem system, final ActorRef testActorRef,
-                final ActorRef thingsShardRegion, final ActorRef policiesShardRegion) {
+        EnforcerActorBuilder(final ActorSystem system, final ActorRef testActorRef, final ActorRef thingsShardRegion,
+                final ActorRef policiesShardRegion) {
             this.system = system;
             this.testActorRef = testActorRef;
             this.thingsShardRegion = thingsShardRegion;
@@ -152,32 +152,34 @@ public final class TestSetup {
 
             final Duration askTimeout = CACHES_CONFIG.getAskTimeout();
 
-            final PolicyEnforcerCacheLoader policyEnforcerCacheLoader =
-                    new PolicyEnforcerCacheLoader(askTimeout, policiesShardRegion);
-            final Cache<EntityIdWithResourceType, Entry<PolicyEnforcer>> policyEnforcerCache =
-                    CaffeineCache.of(Caffeine.newBuilder(), policyEnforcerCacheLoader);
-            final Cache<EntityIdWithResourceType, Entry<Enforcer>> projectedEnforcerCache =
-                    policyEnforcerCache.projectValues(PolicyEnforcer::project, PolicyEnforcer::embed);
-            final AclEnforcerCacheLoader aclEnforcerCacheLoader =
-                    new AclEnforcerCacheLoader(askTimeout, thingsShardRegion);
-            final Cache<EntityIdWithResourceType, Entry<Enforcer>> aclEnforcerCache =
-                    CaffeineCache.of(Caffeine.newBuilder(), aclEnforcerCacheLoader);
-            final ThingEnforcementIdCacheLoader thingEnforcementIdCacheLoader =
-                    new ThingEnforcementIdCacheLoader(askTimeout, thingsShardRegion);
-            final Cache<EntityIdWithResourceType, Entry<EntityIdWithResourceType>> thingIdCache =
-                    CaffeineCache.of(Caffeine.newBuilder(), thingEnforcementIdCacheLoader);
+            final PolicyCacheLoader policyCacheLoader = new PolicyCacheLoader(askTimeout, policiesShardRegion);
+            final Cache<EntityId, Entry<Policy>> policyCache = CaffeineCache.of(Caffeine.newBuilder(),
+                    policyCacheLoader);
+            final PolicyEnforcerCacheLoader policyEnforcerCacheLoader = new PolicyEnforcerCacheLoader(askTimeout,
+                    policyCache);
+            final Cache<EntityIdWithResourceType, Entry<PolicyEnforcer>> policyEnforcerCache = CaffeineCache
+                    .of(Caffeine.newBuilder(), policyEnforcerCacheLoader);
+            final Cache<EntityIdWithResourceType, Entry<Enforcer>> projectedEnforcerCache = policyEnforcerCache
+                    .projectValues(PolicyEnforcer::project, PolicyEnforcer::embed);
+            final AclEnforcerCacheLoader aclEnforcerCacheLoader = new AclEnforcerCacheLoader(askTimeout,
+                    thingsShardRegion);
+            final Cache<EntityIdWithResourceType, Entry<Enforcer>> aclEnforcerCache = CaffeineCache
+                    .of(Caffeine.newBuilder(), aclEnforcerCacheLoader);
+            final ThingEnforcementIdCacheLoader thingEnforcementIdCacheLoader = new ThingEnforcementIdCacheLoader(
+                    askTimeout, thingsShardRegion);
+            final Cache<EntityIdWithResourceType, Entry<EntityIdWithResourceType>> thingIdCache = CaffeineCache
+                    .of(Caffeine.newBuilder(), thingEnforcementIdCacheLoader);
 
             final Set<EnforcementProvider<?>> enforcementProviders = new HashSet<>();
-            enforcementProviders.add(new ThingCommandEnforcement.Provider(thingsShardRegion,
-                    policiesShardRegion, thingIdCache, projectedEnforcerCache, aclEnforcerCache, preEnforcer));
-            enforcementProviders.add(new PolicyCommandEnforcement.Provider(policiesShardRegion, policyEnforcerCache));
-            enforcementProviders.add(
-                    new LiveSignalEnforcement.Provider(thingIdCache, projectedEnforcerCache, aclEnforcerCache,
-                            new DummyLiveSignalPub(testActorRef)));
+            enforcementProviders.add(new ThingCommandEnforcement.Provider(thingsShardRegion, policiesShardRegion,
+                    thingIdCache, policyCache, projectedEnforcerCache, aclEnforcerCache, preEnforcer));
+            enforcementProviders
+                    .add(new PolicyCommandEnforcement.Provider(policiesShardRegion, policyCache, policyEnforcerCache));
+            enforcementProviders.add(new LiveSignalEnforcement.Provider(thingIdCache, projectedEnforcerCache,
+                    aclEnforcerCache, new DummyLiveSignalPub(testActorRef)));
 
-            final Props props =
-                    EnforcerActor.props(testActorRef, enforcementProviders, conciergeForwarder, preEnforcer, null, null,
-                            null);
+            final Props props = EnforcerActor.props(testActorRef, enforcementProviders, conciergeForwarder, preEnforcer,
+                    null, null, null);
             return system.actorOf(props, EnforcerActor.ACTOR_NAME);
         }
 
@@ -187,20 +189,15 @@ public final class TestSetup {
         return "conciergeForwarder-" + UUID.randomUUID();
     }
 
-
     public static DittoHeaders headers(final JsonSchemaVersion schemaVersion) {
         return DittoHeaders.newBuilder()
-                .authorizationContext(
-                        AuthorizationContext.newInstance(DittoAuthorizationContextType.UNSPECIFIED, SUBJECT,
-                                AuthorizationSubject.newInstance(String.format("%s:%s", GOOGLE, SUBJECT_ID))))
-                .schemaVersion(schemaVersion)
-                .build();
+                .authorizationContext(AuthorizationContext.newInstance(DittoAuthorizationContextType.UNSPECIFIED,
+                        SUBJECT, AuthorizationSubject.newInstance(String.format("%s:%s", GOOGLE, SUBJECT_ID))))
+                .schemaVersion(schemaVersion).build();
     }
 
     public static ThingBuilder.FromScratch newThing() {
-        return ThingsModelFactory.newThingBuilder()
-                .setId(THING_ID)
-                .setRevision(1L);
+        return ThingsModelFactory.newThingBuilder().setId(THING_ID).setRevision(1L);
     }
 
     public static ThingCommand readCommand() {
@@ -212,12 +209,12 @@ public final class TestSetup {
     }
 
     /**
-     * Similar to {@link TestKit#expectMsgClass(Class)} but ignores other messages occurring while waiting for a
-     * message of the the passed {@code clazz}.
+     * Similar to {@link TestKit#expectMsgClass(Class)} but ignores other messages
+     * occurring while waiting for a message of the the passed {@code clazz}.
      *
      * @param testKit the TestKit to fish for messages in
-     * @param clazz the type of the message to wait for
-     * @param <T> the type of the waited for message
+     * @param clazz   the type of the message to wait for
+     * @param <T>     the type of the waited for message
      * @return the message
      */
     public static <T> T fishForMsgClass(final TestKit testKit, final Class<T> clazz) {

@@ -598,7 +598,11 @@
                 <artifactId>ditto-services-models-base</artifactId>
                 <version>${project.version}</version>
             </dependency>
-
+            <dependency>
+                <groupId>org.eclipse.ditto</groupId>
+                <artifactId>ditto-services-models-caching</artifactId>
+                <version>${project.version}</version>
+            </dependency>
             <dependency>
                 <groupId>org.eclipse.ditto</groupId>
                 <artifactId>ditto-services-models-acks</artifactId>
@@ -1214,4 +1218,3 @@
     </build>
 
 </project>
-

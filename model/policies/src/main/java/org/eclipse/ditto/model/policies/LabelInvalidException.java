@@ -31,7 +31,7 @@ import org.eclipse.ditto.model.base.json.JsonSchemaVersion;
  * Thrown if a Policy Label is not valid.
  */
 @Immutable
-@JsonParsableException(errorCode = LabelInvalidException.ERROR_CODE)
+@JsonParsableException(errorCode = SubjectExpiryInvalidException.ERROR_CODE)
 public final class LabelInvalidException extends DittoRuntimeException implements PolicyException {
 
     /**

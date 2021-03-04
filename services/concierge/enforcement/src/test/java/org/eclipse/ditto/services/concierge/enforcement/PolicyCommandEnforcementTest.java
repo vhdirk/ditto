@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Contributors to the Eclipse Foundation
+ * Copyright (c) 2021 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -31,6 +31,7 @@ import org.eclipse.ditto.json.assertions.DittoJsonAssertions;
 import org.eclipse.ditto.model.base.auth.AuthorizationContext;
 import org.eclipse.ditto.model.base.auth.AuthorizationSubject;
 import org.eclipse.ditto.model.base.auth.DittoAuthorizationContextType;
+import org.eclipse.ditto.model.base.entity.id.EntityId;
 import org.eclipse.ditto.model.base.exceptions.DittoRuntimeException;
 import org.eclipse.ditto.model.base.headers.DittoHeaderDefinition;
 import org.eclipse.ditto.model.base.headers.DittoHeaders;
@@ -54,6 +55,7 @@ import org.eclipse.ditto.services.models.policies.commands.sudo.SudoRetrievePoli
 import org.eclipse.ditto.services.utils.cache.Cache;
 import org.eclipse.ditto.services.utils.cache.CaffeineCache;
 import org.eclipse.ditto.services.utils.cache.EntityIdWithResourceType;
+import org.eclipse.ditto.services.utils.cache.PolicyCacheLoader;
 import org.eclipse.ditto.services.utils.cache.entry.Entry;
 import org.eclipse.ditto.services.utils.cacheloaders.PolicyEnforcer;
 import org.eclipse.ditto.services.utils.cacheloaders.PolicyEnforcerCacheLoader;
@@ -143,6 +145,7 @@ public final class PolicyCommandEnforcementTest {
 
     private ActorSystem system;
     private TestProbe policiesShardRegionProbe;
+    private Cache<EntityId, Entry<Policy>> policyCache;
     private Cache<EntityIdWithResourceType, Entry<PolicyEnforcer>> enforcerCache;
     private ActorRef enforcer;
 
@@ -152,6 +155,7 @@ public final class PolicyCommandEnforcementTest {
 
         policiesShardRegionProbe = createPoliciesShardRegionProbe();
 
+        policyCache = createCache(new PolicyCacheLoader(ASK_TIMEOUT, policiesShardRegionProbe.ref()));
         enforcerCache = createCache(new PolicyEnforcerCacheLoader(ASK_TIMEOUT, policiesShardRegionProbe.ref()));
 
         enforcer = createEnforcer();
@@ -863,7 +867,7 @@ public final class PolicyCommandEnforcementTest {
         final ActorRef conciergeForwarder = new TestProbe(system, createUniqueName("conciergeForwarder-")).ref();
 
         final PolicyCommandEnforcement.Provider enforcementProvider =
-                new PolicyCommandEnforcement.Provider(policiesShardRegionProbe.ref(), enforcerCache);
+                new PolicyCommandEnforcement.Provider(policiesShardRegionProbe.ref(), policyCache, enforcerCache);
         final Set<EnforcementProvider<?>> enforcementProviders = new HashSet<>();
         enforcementProviders.add(enforcementProvider);
 

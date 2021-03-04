@@ -141,7 +141,8 @@ public final class ThingCommandEnforcement
     private final EnforcerRetriever<Enforcer> thingEnforcerRetriever;
     private final EnforcerRetriever<Enforcer> policyEnforcerRetriever;
     private final Cache<EntityIdWithResourceType, Entry<EntityIdWithResourceType>> thingIdCache;
-    private final Cache<EntityIdWithResourceType, Entry<Enforcer>> policyEnforcerCache;
+    private final Cache<EntityIdWithResourceType, Entry<Policy>> policyCache;
+    private final Cache<EntityId, Entry<Enforcer>> policyEnforcerCache;
     private final PreEnforcer preEnforcer;
     private final Cache<EntityIdWithResourceType, Entry<Enforcer>> aclEnforcerCache;
     private final PolicyIdReferencePlaceholderResolver policyIdReferencePlaceholderResolver;
@@ -150,7 +151,8 @@ public final class ThingCommandEnforcement
             final ActorRef thingsShardRegion,
             final ActorRef policiesShardRegion,
             final Cache<EntityIdWithResourceType, Entry<EntityIdWithResourceType>> thingIdCache,
-            final Cache<EntityIdWithResourceType, Entry<Enforcer>> policyEnforcerCache,
+            final Cache<EntityIdWithResourceType, Entry<Policy>> policyCache,
+            final Cache<EntityId, Entry<Enforcer>> policyEnforcerCache,
             final Cache<EntityIdWithResourceType, Entry<Enforcer>> aclEnforcerCache,
             final PreEnforcer preEnforcer,
             final List<SubjectIssuer> subjectIssuersForPolicyMigration) {
@@ -161,6 +163,7 @@ public final class ThingCommandEnforcement
         this.subjectIssuersForPolicyMigration = requireNonNull(subjectIssuersForPolicyMigration);
 
         this.thingIdCache = requireNonNull(thingIdCache);
+        this.policyCache = requireNonNull(policyCache);
         this.policyEnforcerCache = requireNonNull(policyEnforcerCache);
         this.aclEnforcerCache = requireNonNull(aclEnforcerCache);
         this.preEnforcer = preEnforcer;
@@ -594,6 +597,7 @@ public final class ThingCommandEnforcement
 
     private void invalidatePolicyCache(final PolicyId policyId) {
         final EntityIdWithResourceType entityId = EntityIdWithResourceType.of(PolicyCommand.RESOURCE_TYPE, policyId);
+        policyCache.invalidate(entityId);
         policyEnforcerCache.invalidate(entityId);
         pubSubMediator().tell(DistPubSubAccess.sendToAll(
                 ConciergeMessagingConstants.ENFORCER_ACTOR_PATH,
@@ -780,9 +784,11 @@ public final class ThingCommandEnforcement
             final JsonObject inlinedPolicy) {
 
         final Policy initialPolicy = getInitialPolicy(createThing, inlinedPolicy);
-        final PoliciesValidator policiesValidator = PoliciesValidator.newInstance(initialPolicy);
+        final Set<PolicyEntry> mergedPolicyEntriesSet =
+                PolicyImportHelper.mergeImportedPolicyEntries(initialPolicy, this::policyLoader);
+        final PoliciesValidator policiesValidator = PoliciesValidator.newInstance(mergedPolicyEntriesSet);
         if (policiesValidator.isValid()) {
-            final Enforcer initialEnforcer = PolicyEnforcers.defaultEvaluator(initialPolicy);
+            final Enforcer initialEnforcer = PolicyEnforcers.defaultEvaluator(mergedPolicyEntriesSet);
             return attachEnforcerOrThrow(createThing, initialEnforcer,
                     ThingCommandEnforcement::authorizeByPolicyOrThrow);
         } else {
@@ -790,6 +796,12 @@ public final class ThingCommandEnforcement
                     .dittoHeaders(createThing.getDittoHeaders())
                     .build();
         }
+    }
+
+    private Optional<Policy> policyLoader(final PolicyId policyId) {
+        return policyCache.getBlocking(EntityIdWithResourceType.of(PolicyCommand.RESOURCE_TYPE, policyId))
+                .filter(Entry::exists)
+                .map(Entry::getValueOrThrow);
     }
 
     @SuppressWarnings("java:S1193")
@@ -876,9 +888,23 @@ public final class ThingCommandEnforcement
         if (command instanceof MergeThing) {
             authorized = enforceMergeThingCommand(policyEnforcer, (MergeThing) command, thingResourceKey,
                     authorizationContext);
+            // TODO TJ merge commands
         } else if (command instanceof ThingModifyCommand) {
-            authorized = policyEnforcer.hasUnrestrictedPermissions(thingResourceKey, authorizationContext,
+            authorized = ((ThingModifyCommand) command).getEntity()
+                    .filter(JsonValue::isObject)
+                    .map(JsonValue::asObject)
+                    .map(policyJsonObj -> policyJsonObj.stream()
+                            .filter(f -> !f.getValue().isNull())
+                            .map(JsonField::getKey)
+                            .map(JsonKey::toString))
+                    .map(keys -> keys.map(key ->
+                            PoliciesResourceType.thingResource(command.getResourcePath().append(JsonPointer.of(key)))))
+                    .filter(keys -> keys.allMatch(key ->
+                            policyEnforcer.hasUnrestrictedPermissions(key, authorizationContext, permission))
+                    ).isPresent();
                     Permission.WRITE);
+            // TODO TJ on master:
+            // authorized = policyEnforcer.hasUnrestrictedPermissions(thingResourceKey, authorizationContext, Permission.WRITE)
         } else {
             authorized = policyEnforcer.hasPartialPermissions(thingResourceKey, authorizationContext, Permission.READ);
         }
