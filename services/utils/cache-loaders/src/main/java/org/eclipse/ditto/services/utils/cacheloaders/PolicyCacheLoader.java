@@ -53,11 +53,11 @@ import akka.actor.ActorRef;
  */
 @Immutable
 public final class PolicyCacheLoader
-        implements AsyncCacheLoader<EntityIdWithResourceType, Entry<Policy>>, CacheInvalidationListener<EntityId, Entry<Policy>> {
+        implements AsyncCacheLoader<EntityIdWithResourceType, Entry<Policy>>, CacheInvalidationListener<EntityIdWithResourceType, Entry<Policy>> {
 
     private final ActorAskCacheLoader<Policy, Command<?>> delegate;
-    private final Map<EntityId, Set<EntityId>> policyIdsUsedInImports;
-    private final Set<Consumer<EntityId>> invalidators;
+    private final Map<EntityIdWithResourceType, Set<EntityIdWithResourceType>> policyIdsUsedInImports;
+    private final Set<Consumer<EntityIdWithResourceType>> invalidators;
 
     /**
      * Constructor.
@@ -88,7 +88,7 @@ public final class PolicyCacheLoader
      *
      * @param invalidator the Consumer to call for cache invalidation.
      */
-    public void registerCacheInvalidator(final Consumer<EntityId> invalidator) {
+    public void registerCacheInvalidator(final Consumer<EntityIdWithResourceType> invalidator) {
         invalidators.add(invalidator);
     }
 
@@ -103,7 +103,7 @@ public final class PolicyCacheLoader
         if (response instanceof SudoRetrievePolicyResponse) {
             final SudoRetrievePolicyResponse sudoRetrievePolicyResponse = (SudoRetrievePolicyResponse) response;
             final Policy policy = sudoRetrievePolicyResponse.getPolicy();
-            handleInvalidationOfImportedPolicies(policy);
+            handleInvalidationOfImportedPolicies(policy, cacheLookupContext);
             final long revision = policy.getRevision().map(PolicyRevision::toLong)
                     .orElseThrow(badPolicyResponse("no revision"));
             return Entry.of(revision, policy);
@@ -114,38 +114,32 @@ public final class PolicyCacheLoader
         }
     }
 
-    private void handleInvalidationOfImportedPolicies(final Policy policy) {
+    private void handleInvalidationOfImportedPolicies(final Policy policy, @Nullable final CacheLookupContext cacheLookupContext) {
         policy.getEntityId()
-            .ifPresent(policyIdUsingImports ->
+            .ifPresent(policyIdUsingImports -> {
+                final EntityIdWithResourceType policyIdUsingImportsWithResourceType = EntityIdWithResourceType.of(PolicyCommand.RESOURCE_TYPE,
+                                    policyIdUsingImports, cacheLookupContext);
                 policy.getImports().ifPresent(imports ->
                         imports.stream()
                             .map(PolicyImport::getImportedPolicyId)
                             .forEach(importedPolicyId -> {
-                                final Set<EntityId> alreadyUsedImports =
-                                    policyIdsUsedInImports.getOrDefault(importedPolicyId, new HashSet<>());
-                                alreadyUsedImports.add(policyIdUsingImports);
-                                policyIdsUsedInImports.put(importedPolicyId, alreadyUsedImports);
-                            })));
+                                final EntityIdWithResourceType importedPolicyIdWithResourceType = EntityIdWithResourceType.of(PolicyCommand.RESOURCE_TYPE,
+                                    importedPolicyId, cacheLookupContext);
+                                final Set<EntityIdWithResourceType> alreadyUsedImports =
+                                    policyIdsUsedInImports.getOrDefault(
+                                            importedPolicyIdWithResourceType, new HashSet<>());
+                                alreadyUsedImports.add(policyIdUsingImportsWithResourceType);
+                                policyIdsUsedInImports.put(importedPolicyIdWithResourceType, alreadyUsedImports);
+                            }));
+                        });
     }
 
     private static Supplier<RuntimeException> badPolicyResponse(final String message) {
         return () -> new IllegalStateException("Bad SudoRetrievePolicyResponse: " + message);
     }
 
-    /**
-     * Creates a sudo command for retrieving a policy.
-     *
-     * @param policyId           the policyId.
-     * @param cacheLookupContext the context to apply when doing the cache lookup.
-     * @return the created command.
-     */
-    static SudoRetrievePolicy sudoRetrievePolicy(final EntityId policyId,
-            @Nullable final CacheLookupContext cacheLookupContext) {
-        return sudoRetrievePolicy(PolicyId.of(policyId), cacheLookupContext);
-    }
-
     @Override
-    public void onCacheEntryInvalidated(final EntityId key, @Nullable final Entry<Policy> value) {
+    public void onCacheEntryInvalidated(final EntityIdWithResourceType key, @Nullable final Entry<Policy> value) {
         Optional.ofNullable(policyIdsUsedInImports.get(key))
                 .ifPresent(affectedPoliciesUsingImportedPolicyId ->
                         affectedPoliciesUsingImportedPolicyId.forEach(id ->
