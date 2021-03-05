@@ -12,6 +12,7 @@
  */
 package org.eclipse.ditto.services.things.starter;
 
+import org.eclipse.ditto.services.models.policies.commands.sudo.SudoRetrievePolicy;
 import org.eclipse.ditto.services.models.streaming.SudoStreamPids;
 import org.eclipse.ditto.services.models.things.commands.sudo.SudoRetrieveThing;
 import org.eclipse.ditto.services.utils.health.RetrieveHealth;
@@ -46,7 +47,8 @@ public final class ThingsServiceGlobalCommandRegistryTest extends GlobalCommandR
                 CleanupPersistence.class,
                 RetrieveHealth.class,
                 PurgeEntities.class,
-                PublishSignal.class
+                PublishSignal.class,
+                SudoRetrievePolicy.class
         );
     }
 

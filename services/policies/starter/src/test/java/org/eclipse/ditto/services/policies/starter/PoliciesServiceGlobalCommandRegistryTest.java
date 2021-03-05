@@ -24,7 +24,10 @@ import org.eclipse.ditto.signals.commands.devops.ExecutePiggybackCommand;
 import org.eclipse.ditto.signals.commands.messages.SendClaimMessage;
 import org.eclipse.ditto.signals.commands.namespaces.PurgeNamespace;
 import org.eclipse.ditto.signals.commands.policies.actions.ActivateTokenIntegration;
+import org.eclipse.ditto.signals.commands.policies.modify.DeletePolicyImport;
 import org.eclipse.ditto.signals.commands.policies.modify.DeleteSubject;
+import org.eclipse.ditto.signals.commands.policies.modify.ModifyPolicyImport;
+import org.eclipse.ditto.signals.commands.policies.modify.ModifyPolicyImports;
 import org.eclipse.ditto.signals.commands.policies.query.RetrieveResource;
 import org.eclipse.ditto.signals.commands.things.modify.ModifyFeatureProperty;
 import org.eclipse.ditto.signals.commands.things.query.RetrieveFeature;
@@ -50,6 +53,9 @@ public final class PoliciesServiceGlobalCommandRegistryTest extends GlobalComman
                 RetrieveHealth.class,
                 PurgeEntities.class,
                 PublishSignal.class,
+                ModifyPolicyImport.class,
+                ModifyPolicyImports.class,
+                DeletePolicyImport.class,
 
                 // added due to ditto-model-placeholders
                 CreateSubscription.class,
