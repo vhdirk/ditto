@@ -98,7 +98,6 @@ public final class DefaultEnforcerActorFactory implements EnforcerActorFactory<C
         final ActorSystem actorSystem = context.system();
 
         final ActorRef policiesShardRegionProxy = shardRegions.policies();
-
         final ActorRef thingsShardRegionProxy = shardRegions.things();
 
         final AsyncCacheLoader<EntityIdWithResourceType, Entry<EntityIdWithResourceType>> thingEnforcerIdCacheLoader =

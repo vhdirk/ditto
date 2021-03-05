@@ -12,11 +12,11 @@
  */
 package org.eclipse.ditto.services.concierge.starter.actors;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import org.assertj.core.api.Assertions;
 import org.eclipse.ditto.json.JsonPointer;
 import org.eclipse.ditto.json.JsonValue;
 import org.eclipse.ditto.model.base.headers.DittoHeaders;
@@ -92,8 +92,8 @@ public final class PolicyCacheUpdateActorTest {
     public void actorSubscribesViaPubSub() {
         final DistributedPubSubMediator.Subscribe subscribe =
                 pubSubMediatorProbe.expectMsgClass(DistributedPubSubMediator.Subscribe.class);
-        Assertions.assertThat(subscribe.topic()).isEqualTo(PolicyEvent.TYPE_PREFIX);
-        Assertions.assertThat(subscribe.ref()).isEqualTo(updateActor);
+        assertThat(subscribe.topic()).isEqualTo(PolicyEvent.TYPE_PREFIX);
+        assertThat(subscribe.ref()).isEqualTo(updateActor);
     }
 
     @Test
@@ -132,7 +132,7 @@ public final class PolicyCacheUpdateActorTest {
         if (invalidate) {
             verify(mockEnforcerCache).invalidate(ENTITY_ID);
         } else {
-            Mockito.verifyZeroInteractions(mockEnforcerCache);
+            Mockito.verifyNoMoreInteractions(mockEnforcerCache);
         }
     }
 

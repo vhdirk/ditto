@@ -57,7 +57,6 @@ public class PolicyCacheUpdateActor extends AbstractPubSubListenerActor {
      * @param policyCache the policy cache.
      * @param policyEnforcerCache the policy-enforcer cache.
      * @param pubSubMediator Akka pub-sub mediator.
-     * @param instanceIndex the index of this service instance.
      * @return Akka {@code Props} object.
      */
     public static Props props(
@@ -75,7 +74,7 @@ public class PolicyCacheUpdateActor extends AbstractPubSubListenerActor {
         return receiveBuilder().match(PolicyEvent.class, this::handleEvent).build();
     }
 
-    private void handleEvent(final PolicyEvent<?> policyEvent) {
+    private void handleEvent(final PolicyEvent policyEvent) {
         final EntityIdWithResourceType key = EntityIdWithResourceType.of(PolicyCommand.RESOURCE_TYPE, policyEvent.getEntityId());
         policyCache.invalidate(key);
         policyEnforcerCache.invalidate(key);
