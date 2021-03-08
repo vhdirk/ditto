@@ -209,10 +209,12 @@ public final class ThingsUpdaterTest {
         final UpdaterConfig config =
                 DefaultUpdaterConfig.of(ConfigFactory.parseString("updater.event-processing-active=false"));
         final ActorRef thingsShardRegion = shardRegionFactory.getThingsShardRegion(NUMBER_OF_SHARDS);
+        final ActorRef policiesShardRegion = shardRegionFactory.getPoliciesShardRegion(NUMBER_OF_SHARDS);
         final DistributedSub mockDistributedSub = Mockito.mock(DistributedSub.class);
         final TestProbe pubSubMediatorProbe = TestProbe.apply(actorSystem);
         return actorSystem.actorOf(
-                ThingsUpdater.props(mockDistributedSub, thingsShardRegion, config, blockedNamespaces,
+                ThingsUpdater.props(mockDistributedSub, thingsShardRegion,
+                        policiesShardRegion, config, blockedNamespaces,
                         pubSubMediatorProbe.ref()));
     }
 

@@ -131,7 +131,8 @@ public final class SearchUpdaterRootActor extends AbstractActor {
                 ThingEventPubSubFactory.shardIdOnly(getContext(), numberOfShards, DistributedAcks.empty())
                         .startDistributedSub();
         final Props thingsUpdaterProps =
-                ThingsUpdater.props(thingEventSub, updaterShard, updaterConfig, blockedNamespaces,
+                ThingsUpdater.props(thingEventSub, updaterShard,
+                                        policiesShard, updaterConfig, blockedNamespaces,
                         pubSubMediator);
 
         thingsUpdaterActor = startChildActor(ThingsUpdater.ACTOR_NAME, thingsUpdaterProps);

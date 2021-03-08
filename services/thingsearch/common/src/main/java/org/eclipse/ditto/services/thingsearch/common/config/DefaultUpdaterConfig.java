@@ -17,6 +17,8 @@ import java.util.Objects;
 
 import javax.annotation.concurrent.Immutable;
 
+import org.eclipse.ditto.services.utils.cache.config.CacheConfig;
+import org.eclipse.ditto.services.utils.cache.config.DefaultCacheConfig;
 import org.eclipse.ditto.services.utils.config.ConfigWithFallback;
 
 import com.typesafe.config.Config;
@@ -38,6 +40,7 @@ public final class DefaultUpdaterConfig implements UpdaterConfig {
     private final boolean eventProcessingActive;
     private final BackgroundSyncConfig backgroundSyncConfig;
     private final StreamConfig streamConfig;
+    private final CachesConfig cachesConfig;
 
     private DefaultUpdaterConfig(final ConfigWithFallback updaterScopedConfig) {
         maxIdleTime = updaterScopedConfig.getDuration(UpdaterConfigValue.MAX_IDLE_TIME.getConfigPath());
@@ -48,6 +51,7 @@ public final class DefaultUpdaterConfig implements UpdaterConfig {
                 updaterScopedConfig.getBoolean(UpdaterConfigValue.EVENT_PROCESSING_ACTIVE.getConfigPath());
         backgroundSyncConfig = DefaultBackgroundSyncConfig.fromUpdaterConfig(updaterScopedConfig);
         streamConfig = DefaultStreamConfig.of(updaterScopedConfig);
+        cachesConfig = UpdaterCachesConfig.of(updaterScopedConfig);
     }
 
     /**
@@ -93,6 +97,11 @@ public final class DefaultUpdaterConfig implements UpdaterConfig {
     }
 
     @Override
+    public CachesConfig getCachesConfig() {
+        return cachesConfig;
+    }
+
+    @Override
     public boolean equals(final Object o) {
         if (this == o) {
             return true;
@@ -106,13 +115,14 @@ public final class DefaultUpdaterConfig implements UpdaterConfig {
                 Objects.equals(maxIdleTime, that.maxIdleTime) &&
                 Objects.equals(shardingStatePollInterval, that.shardingStatePollInterval) &&
                 Objects.equals(backgroundSyncConfig, that.backgroundSyncConfig) &&
-                Objects.equals(streamConfig, that.streamConfig);
+                Objects.equals(streamConfig, that.streamConfig) &&
+                Objects.equals(cachesConfig, that.cachesConfig);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(maxIdleTime, maxBulkSize, shardingStatePollInterval, eventProcessingActive,
-                backgroundSyncConfig, streamConfig);
+                backgroundSyncConfig, streamConfig, cachesConfig);
     }
 
     @Override
@@ -124,6 +134,7 @@ public final class DefaultUpdaterConfig implements UpdaterConfig {
                 ", eventProcessingActive=" + eventProcessingActive +
                 ", backgroundSyncConfig=" + backgroundSyncConfig +
                 ", streamConfig=" + streamConfig +
+                ", cachesConfig=" + cachesConfig +
                 "]";
     }
 
