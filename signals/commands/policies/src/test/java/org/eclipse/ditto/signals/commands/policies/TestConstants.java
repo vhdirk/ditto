@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Contributors to the Eclipse Foundation
+ * Copyright (c) 2021 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -25,11 +25,14 @@ import org.eclipse.ditto.model.base.auth.AuthorizationSubject;
 import org.eclipse.ditto.model.base.auth.DittoAuthorizationContextType;
 import org.eclipse.ditto.model.base.headers.DittoHeaderDefinition;
 import org.eclipse.ditto.model.base.headers.DittoHeaders;
+import org.eclipse.ditto.model.policies.EffectedImports;
 import org.eclipse.ditto.model.policies.EffectedPermissions;
 import org.eclipse.ditto.model.policies.Label;
 import org.eclipse.ditto.model.policies.PoliciesModelFactory;
 import org.eclipse.ditto.model.policies.PolicyEntry;
 import org.eclipse.ditto.model.policies.PolicyId;
+import org.eclipse.ditto.model.policies.PolicyImport;
+import org.eclipse.ditto.model.policies.PolicyImports;
 import org.eclipse.ditto.model.policies.PolicyRevision;
 import org.eclipse.ditto.model.policies.Resource;
 import org.eclipse.ditto.model.policies.ResourceKey;
@@ -325,6 +328,21 @@ public final class TestConstants {
          */
         public static final SubjectNotModifiableException SUBJECT_NOT_MODIFIABLE_EXCEPTION =
                 SubjectNotModifiableException.newBuilder(POLICY_ID, LABEL.toString(), SUBJECT_ID.toString()).build();
+
+        /**
+         * A known identifier for a {@code Policy}.
+         */
+        public static final PolicyId IMPORTED_POLICY_ID = PolicyId.of("org.eclipse.ditto.example", "mySupportPolicy");
+
+        /**
+         * A known {@code PolicyImport} for a {@code Policy}.
+         */
+        public static final PolicyImport POLICY_IMPORT = PolicyImport.newInstance(IMPORTED_POLICY_ID, false, EffectedImports.newInstance(null, null));
+
+        /**
+         * A known {@code PolicyImports} for a {@code Policy}.
+         */
+        public static final PolicyImports POLICY_IMPORTS = PolicyImports.newInstance(POLICY_IMPORT);
 
         private Policy() {
             throw new AssertionError();

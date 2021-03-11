@@ -10,70 +10,78 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.eclipse.ditto.signals.events.policies;
+package org.eclipse.ditto.signals.commands.policies.modify;
 
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.eclipse.ditto.model.base.assertions.DittoBaseAssertions.assertThat;
 import static org.mutabilitydetector.unittesting.AllowedReason.provided;
 import static org.mutabilitydetector.unittesting.MutabilityAssert.assertInstancesOf;
 import static org.mutabilitydetector.unittesting.MutabilityMatchers.areImmutable;
 
-import org.assertj.core.api.Assertions;
 import org.eclipse.ditto.json.JsonFactory;
 import org.eclipse.ditto.json.JsonObject;
 import org.eclipse.ditto.model.base.json.FieldType;
-import org.eclipse.ditto.model.policies.Label;
 import org.eclipse.ditto.model.policies.PolicyId;
-import org.eclipse.ditto.signals.events.base.Event;
+import org.eclipse.ditto.model.policies.PolicyIdInvalidException;
+import org.eclipse.ditto.signals.commands.policies.PolicyCommand;
+import org.eclipse.ditto.signals.commands.policies.TestConstants;
 import org.junit.Test;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
 
 /**
- * Unit test for {@link PolicyImportDeleted}.
+ * Unit test for {@link DeletePolicyImport}.
  */
-public final class PolicyImportDeletedTest {
+public class DeletePolicyImportTest {
 
     private static final JsonObject KNOWN_JSON = JsonFactory.newObjectBuilder()
-            .set(Event.JsonFields.TIMESTAMP, TestConstants.TIMESTAMP.toString())
-            .set(Event.JsonFields.TYPE, PolicyImportDeleted.TYPE)
-            .set(Event.JsonFields.REVISION, TestConstants.Policy.REVISION_NUMBER)
-            .set(PolicyEvent.JsonFields.POLICY_ID, TestConstants.Policy.POLICY_ID.toString())
-            .set(PolicyImportDeleted.JSON_IMPORTED_POLICY_ID, TestConstants.Policy.IMPORTED_POLICY_ID.toString())
+            .set(PolicyCommand.JsonFields.TYPE, DeletePolicyImport.TYPE)
+            .set(PolicyCommand.JsonFields.JSON_POLICY_ID, TestConstants.Policy.POLICY_ID.toString())
+            .set(DeletePolicyImport.JSON_IMPORTED_POLICY_ID, TestConstants.Policy.IMPORTED_POLICY_ID.toString())
             .build();
 
 
     @Test
     public void assertImmutability() {
-        assertInstancesOf(PolicyImportDeleted.class, areImmutable(), provided(Label.class).isAlsoImmutable());
+        assertInstancesOf(DeletePolicyImport.class,
+                areImmutable(),
+                provided(PolicyId.class).isAlsoImmutable());
     }
 
 
     @Test
     public void testHashCodeAndEquals() {
-        EqualsVerifier.forClass(PolicyImportDeleted.class)
+        EqualsVerifier.forClass(DeletePolicyImport.class)
                 .withRedefinedSuperclass()
                 .verify();
     }
 
+
     @Test(expected = NullPointerException.class)
     public void tryToCreateInstanceWithNullPolicyId() {
-        PolicyImportDeleted.of((PolicyId) null, TestConstants.Policy.IMPORTED_POLICY_ID, TestConstants.Policy.REVISION_NUMBER,
+        DeletePolicyImport.of((PolicyId) null, TestConstants.Policy.IMPORTED_POLICY_ID,
                 TestConstants.EMPTY_DITTO_HEADERS);
+    }
+
+    @Test
+    public void tryToCreateInstanceWithInvalidPolicyId() {
+        assertThatExceptionOfType(PolicyIdInvalidException.class)
+                .isThrownBy(() -> DeletePolicyImport.of(PolicyId.of("undefined"), TestConstants.Policy.IMPORTED_POLICY_ID,
+                        TestConstants.EMPTY_DITTO_HEADERS));
     }
 
 
     @Test(expected = NullPointerException.class)
     public void tryToCreateInstanceWithNullLabel() {
-        PolicyImportDeleted.of(TestConstants.Policy.POLICY_ID, null, TestConstants.Policy.REVISION_NUMBER,
+        DeletePolicyImport.of(TestConstants.Policy.POLICY_ID, null,
                 TestConstants.EMPTY_DITTO_HEADERS);
     }
 
 
     @Test
     public void toJsonReturnsExpected() {
-        final PolicyImportDeleted underTest = PolicyImportDeleted.of(TestConstants.Policy.POLICY_ID,
-                TestConstants.Policy.IMPORTED_POLICY_ID, TestConstants.Policy.REVISION_NUMBER, TestConstants.TIMESTAMP,
-                TestConstants.EMPTY_DITTO_HEADERS);
+        final DeletePolicyImport underTest = DeletePolicyImport.of(
+                TestConstants.Policy.POLICY_ID, TestConstants.Policy.IMPORTED_POLICY_ID, TestConstants.EMPTY_DITTO_HEADERS);
         final JsonObject actualJson = underTest.toJson(FieldType.regularOrSpecial());
 
         assertThat(actualJson).isEqualTo(KNOWN_JSON);
@@ -82,11 +90,10 @@ public final class PolicyImportDeletedTest {
 
     @Test
     public void createInstanceFromValidJson() {
-        final PolicyImportDeleted underTest =
-                PolicyImportDeleted.fromJson(KNOWN_JSON.toString(), TestConstants.EMPTY_DITTO_HEADERS);
+        final DeletePolicyImport underTest =
+                DeletePolicyImport.fromJson(KNOWN_JSON.toString(), TestConstants.EMPTY_DITTO_HEADERS);
 
-        Assertions.assertThat(underTest).isNotNull();
-        assertThat((CharSequence) underTest.getPolicyEntityId()).isEqualTo(TestConstants.Policy.POLICY_ID);
+        assertThat(underTest).isNotNull();
         assertThat((CharSequence) underTest.getImportedPolicyId()).isEqualTo(TestConstants.Policy.IMPORTED_POLICY_ID);
     }
 
