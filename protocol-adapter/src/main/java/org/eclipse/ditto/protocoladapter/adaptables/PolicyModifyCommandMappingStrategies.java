@@ -19,11 +19,14 @@ import org.eclipse.ditto.protocoladapter.JsonifiableMapper;
 import org.eclipse.ditto.signals.commands.policies.modify.CreatePolicy;
 import org.eclipse.ditto.signals.commands.policies.modify.DeletePolicy;
 import org.eclipse.ditto.signals.commands.policies.modify.DeletePolicyEntry;
+import org.eclipse.ditto.signals.commands.policies.modify.DeletePolicyImport;
 import org.eclipse.ditto.signals.commands.policies.modify.DeleteResource;
 import org.eclipse.ditto.signals.commands.policies.modify.DeleteSubject;
 import org.eclipse.ditto.signals.commands.policies.modify.ModifyPolicy;
 import org.eclipse.ditto.signals.commands.policies.modify.ModifyPolicyEntries;
 import org.eclipse.ditto.signals.commands.policies.modify.ModifyPolicyEntry;
+import org.eclipse.ditto.signals.commands.policies.modify.ModifyPolicyImport;
+import org.eclipse.ditto.signals.commands.policies.modify.ModifyPolicyImports;
 import org.eclipse.ditto.signals.commands.policies.modify.ModifyResource;
 import org.eclipse.ditto.signals.commands.policies.modify.ModifyResources;
 import org.eclipse.ditto.signals.commands.policies.modify.ModifySubject;
@@ -108,6 +111,18 @@ final class PolicyModifyCommandMappingStrategies extends AbstractPolicyMappingSt
                 entrySubjectIdFromPath(adaptable.getPayload().getPath()),
                 dittoHeadersFrom(adaptable)));
 
+        mappingStrategies.put(ModifyPolicyImports.TYPE,
+                adaptable -> ModifyPolicyImports.of(policyIdFromTopicPath(adaptable.getTopicPath()),
+                        policyImportsFrom(adaptable), dittoHeadersFrom(adaptable)));
+
+        mappingStrategies.put(ModifyPolicyImport.TYPE,
+                adaptable -> ModifyPolicyImport.of(policyIdFromTopicPath(adaptable.getTopicPath()),
+                        policyImportFrom(adaptable), dittoHeadersFrom(adaptable)));
+
+        mappingStrategies.put(DeletePolicyImport.TYPE,
+                adaptable -> DeletePolicyImport.of(policyIdFromTopicPath(adaptable.getTopicPath()),
+                        importedPolicyIdFrom(adaptable),
+                        dittoHeadersFrom(adaptable)));
         return mappingStrategies;
     }
 

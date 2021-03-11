@@ -20,6 +20,8 @@ import org.eclipse.ditto.signals.commands.policies.query.PolicyQueryCommand;
 import org.eclipse.ditto.signals.commands.policies.query.RetrievePolicy;
 import org.eclipse.ditto.signals.commands.policies.query.RetrievePolicyEntries;
 import org.eclipse.ditto.signals.commands.policies.query.RetrievePolicyEntry;
+import org.eclipse.ditto.signals.commands.policies.query.RetrievePolicyImport;
+import org.eclipse.ditto.signals.commands.policies.query.RetrievePolicyImports;
 import org.eclipse.ditto.signals.commands.policies.query.RetrieveResource;
 import org.eclipse.ditto.signals.commands.policies.query.RetrieveResources;
 import org.eclipse.ditto.signals.commands.policies.query.RetrieveSubject;
@@ -54,6 +56,14 @@ final class PolicyQueryCommandMappingStrategies extends AbstractPolicyMappingStr
 
         mappingStrategies.put(RetrievePolicyEntries.TYPE,
                 adaptable -> RetrievePolicyEntries.of(policyIdFromTopicPath(adaptable.getTopicPath()),
+                        dittoHeadersFrom(adaptable)));
+
+        mappingStrategies.put(RetrievePolicyImport.TYPE,
+                adaptable -> RetrievePolicyImport.of(policyIdFromTopicPath(adaptable.getTopicPath()),
+                        importedPolicyIdFrom(adaptable), dittoHeadersFrom(adaptable)));
+
+        mappingStrategies.put(RetrievePolicyImports.TYPE,
+                adaptable -> RetrievePolicyImports.of(policyIdFromTopicPath(adaptable.getTopicPath()),
                         dittoHeadersFrom(adaptable)));
 
         mappingStrategies.put(RetrieveResource.TYPE,

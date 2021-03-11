@@ -1,0 +1,153 @@
+/*
+ * Copyright (c) 2021 Contributors to the Eclipse Foundation
+ *
+ * See the NOTICE file(s) distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ */
+package org.eclipse.ditto.services.gateway.endpoints.routes.policies;
+
+import static org.eclipse.ditto.model.base.exceptions.DittoJsonException.wrapJsonRuntimeException;
+
+import org.eclipse.ditto.json.JsonFactory;
+import org.eclipse.ditto.json.JsonObject;
+import org.eclipse.ditto.model.base.headers.DittoHeaders;
+import org.eclipse.ditto.model.policies.PoliciesModelFactory;
+import org.eclipse.ditto.model.policies.PolicyImport;
+import org.eclipse.ditto.model.policies.PolicyImports;
+import org.eclipse.ditto.model.policies.PolicyId;
+import org.eclipse.ditto.protocoladapter.HeaderTranslator;
+import org.eclipse.ditto.services.gateway.endpoints.routes.AbstractRoute;
+import org.eclipse.ditto.services.gateway.security.authentication.AuthenticationResult;
+import org.eclipse.ditto.services.gateway.util.config.endpoints.CommandConfig;
+import org.eclipse.ditto.services.gateway.util.config.endpoints.HttpConfig;
+import org.eclipse.ditto.signals.commands.policies.modify.DeletePolicyImport;
+import org.eclipse.ditto.signals.commands.policies.modify.ModifyPolicyImports;
+import org.eclipse.ditto.signals.commands.policies.modify.ModifyPolicyImport;
+import org.eclipse.ditto.signals.commands.policies.query.RetrievePolicyImports;
+import org.eclipse.ditto.signals.commands.policies.query.RetrievePolicyImport;
+
+import akka.actor.ActorRef;
+import akka.actor.ActorSystem;
+import akka.http.javadsl.server.PathMatchers;
+import akka.http.javadsl.server.RequestContext;
+import akka.http.javadsl.server.Route;
+
+/**
+ * Builder for creating Akka HTTP routes for Policy {@code /imports}.
+ */
+final class PolicyImportsRoute extends AbstractRoute {
+
+    /**
+     * Constructs the {@code /imports} route builder.
+     *
+     * @param proxyActor an actor selection of the command delegating actor.
+     * @param actorSystem the ActorSystem to use.
+     * @param httpConfig the configuration settings of the Gateway service's HTTP endpoint.
+     * @param commandConfig the configuration settings of the Gateway service's incoming command processing.
+     * @param headerTranslator translates headers from external sources or to external sources.
+     * @param tokenIntegrationSubjectIdFactory factory of token integration subject IDs.
+     * @throws NullPointerException if any argument is {@code null}.
+     */
+    PolicyImportsRoute(final ActorRef proxyActor,
+            final ActorSystem actorSystem,
+            final HttpConfig httpConfig,
+            final CommandConfig commandConfig,
+            final HeaderTranslator headerTranslator) {
+
+        super(proxyActor, actorSystem, httpConfig, commandConfig, headerTranslator);
+    }
+
+    /**
+     * Builds the {@code /imports} route.
+     *
+     * @return the {@code /imports} route.
+     */
+    Route buildPolicyImportsRoute(final RequestContext ctx, final DittoHeaders dittoHeaders, final PolicyId policyId,
+            final AuthenticationResult authResult) {
+        return concat(
+                policyImports(ctx, dittoHeaders, policyId),
+                policyImport(ctx, dittoHeaders, policyId)
+        );
+    }
+
+    /*
+     * Describes {@code /imports} route.
+     *
+     * @return {@code /imports} route.
+     */
+    private Route policyImports(final RequestContext ctx, final DittoHeaders dittoHeaders,
+            final PolicyId policyId) {
+
+        return pathEndOrSingleSlash(() ->
+                concat(
+                        get(() -> // GET /imports
+                                handlePerRequest(ctx,
+                                        RetrievePolicyImports.of(policyId, dittoHeaders))
+                        ),
+                        put(() -> // PUT /imports
+                                ensureMediaTypeJsonWithFallbacksThenExtractDataBytes(ctx, dittoHeaders,
+                                        payloadSource ->
+                                                handlePerRequest(ctx, dittoHeaders, payloadSource,
+                                                        policyImportsJson ->
+                                                                ModifyPolicyImports.of(policyId,
+                                                                        createPolicyImportsForPut(policyImportsJson),
+                                                                        dittoHeaders))
+                                )
+                        )
+                )
+        );
+    }
+
+    private static PolicyImports createPolicyImportsForPut(final String jsonString) {
+        final JsonObject jsonObject = wrapJsonRuntimeException(() -> JsonFactory.newObject(jsonString));
+        return PoliciesModelFactory.newPolicyImports(jsonObject);
+    }
+
+    /*
+     * Describes {@code /imports/<importedPolicyId>} route.
+     *
+     * @return {@code /imports/<importedPolicyId>} route.
+     */
+    private Route policyImport(final RequestContext ctx, final DittoHeaders dittoHeaders,
+            final PolicyId policyId) {
+
+        return rawPathPrefix(PathMatchers.slash().concat(PathMatchers.segment()), importedPolicyId ->
+                pathEndOrSingleSlash(() ->
+                        concat(
+                                get(() -> // GET /imports/<importedPolicyId>
+                                        handlePerRequest(ctx,
+                                                RetrievePolicyImport.of(policyId,
+                                                        PolicyId.of(importedPolicyId),
+                                                        dittoHeaders))
+                                ),
+                                put(() -> // PUT /imports/<importedPolicyId>
+                                        ensureMediaTypeJsonWithFallbacksThenExtractDataBytes(ctx, dittoHeaders,
+                                                payloadSource ->
+                                                        handlePerRequest(ctx, dittoHeaders, payloadSource,
+                                                                policyImportJson -> ModifyPolicyImport
+                                                                        .of(policyId,
+                                                                                createPolicyImportForPut(policyImportJson,
+                                                                                        importedPolicyId), dittoHeaders))
+                                        )
+                                ),
+                                delete(() -> // DELETE /imports/<importedPolicyId>
+                                        handlePerRequest(ctx,
+                                                DeletePolicyImport.of(policyId, PolicyId.of(
+                                                                        importedPolicyId),
+                                                        dittoHeaders)))
+                        )
+                )
+        );
+    }
+
+    private static PolicyImport createPolicyImportForPut(final String jsonString, final CharSequence importedPolicyString) {
+        final JsonObject jsonObject = wrapJsonRuntimeException(() -> JsonFactory.newObject(jsonString));
+        return PoliciesModelFactory.newPolicyImport(PolicyId.of(importedPolicyString), jsonObject);
+    }
+}

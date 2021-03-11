@@ -19,6 +19,8 @@ import org.eclipse.ditto.protocoladapter.JsonifiableMapper;
 import org.eclipse.ditto.signals.commands.policies.query.PolicyQueryCommandResponse;
 import org.eclipse.ditto.signals.commands.policies.query.RetrievePolicyEntriesResponse;
 import org.eclipse.ditto.signals.commands.policies.query.RetrievePolicyEntryResponse;
+import org.eclipse.ditto.signals.commands.policies.query.RetrievePolicyImportResponse;
+import org.eclipse.ditto.signals.commands.policies.query.RetrievePolicyImportsResponse;
 import org.eclipse.ditto.signals.commands.policies.query.RetrievePolicyResponse;
 import org.eclipse.ditto.signals.commands.policies.query.RetrieveResourceResponse;
 import org.eclipse.ditto.signals.commands.policies.query.RetrieveResourcesResponse;
@@ -48,6 +50,7 @@ final class PolicyQueryCommandResponseMappingStrategies
         addPolicyEntryResponses(mappingStrategies);
         addPolicyEntryResourceResponses(mappingStrategies);
         addPolicyEntrySubjectResponses(mappingStrategies);
+        addPolicyImportResponses(mappingStrategies);
         return mappingStrategies;
     }
 
@@ -70,6 +73,19 @@ final class PolicyQueryCommandResponseMappingStrategies
                         policyEntriesFrom(adaptable),
                         dittoHeadersFrom(adaptable)));
 
+    }
+
+    private static void addPolicyImportResponses(
+            final Map<String, JsonifiableMapper<PolicyQueryCommandResponse<?>>> mappingStrategies) {
+
+        mappingStrategies.put(RetrievePolicyImportResponse.TYPE,
+                adaptable -> RetrievePolicyImportResponse.of(policyIdFromTopicPath(adaptable.getTopicPath()),
+                        policyImportFrom(adaptable), dittoHeadersFrom(adaptable)));
+
+        mappingStrategies.put(RetrievePolicyImportsResponse.TYPE,
+                adaptable -> RetrievePolicyImportsResponse.of(policyIdFromTopicPath(adaptable.getTopicPath()),
+                        policyImportsFrom(adaptable),
+                        dittoHeadersFrom(adaptable)));
     }
 
     private static void addPolicyEntryResourceResponses(

@@ -28,6 +28,8 @@ import org.eclipse.ditto.model.policies.PoliciesModelFactory;
 import org.eclipse.ditto.model.policies.Policy;
 import org.eclipse.ditto.model.policies.PolicyEntry;
 import org.eclipse.ditto.model.policies.PolicyId;
+import org.eclipse.ditto.model.policies.PolicyImport;
+import org.eclipse.ditto.model.policies.PolicyImports;
 import org.eclipse.ditto.model.policies.Resource;
 import org.eclipse.ditto.model.policies.ResourceKey;
 import org.eclipse.ditto.model.policies.Resources;
@@ -100,6 +102,28 @@ abstract class AbstractPolicyMappingStrategies<T extends Jsonifiable.WithPredica
     }
 
     /**
+     * Policy imports from policy imports.
+     *
+     * @param adaptable the adaptable
+     * @return the policy imports
+     */
+    protected static PolicyImports policyImportsFrom(final Adaptable adaptable) {
+        final JsonObject value = getValueFromPayload(adaptable);
+        return PoliciesModelFactory.newPolicyImports(value);
+    }
+
+    /**
+     * Policy entry from policy entry.
+     *
+     * @param adaptable the adaptable
+     * @return the policy entry
+     */
+    protected static PolicyImport policyImportFrom(final Adaptable adaptable) {
+        final JsonObject value = getValueFromPayload(adaptable);
+        return PoliciesModelFactory.newPolicyImport(importedPolicyIdFrom(adaptable), value);
+    }
+
+    /**
      * Resource from resource.
      *
      * @param adaptable the adaptable
@@ -134,6 +158,23 @@ abstract class AbstractPolicyMappingStrategies<T extends Jsonifiable.WithPredica
                 .flatMap(JsonPointer::getRoot)
                 .map(JsonKey::toString)
                 .map(Label::of)
+                .orElseThrow(() -> JsonParseException.newBuilder().build());
+    }
+
+    /**
+     * PolicyId from policyId.
+     *
+     * @param adaptable the adaptable
+     * @return the policyId
+     */
+    protected static PolicyId importedPolicyIdFrom(final Adaptable adaptable) {
+        final MessagePath path = adaptable.getPayload().getPath();
+        return path.getRoot()
+                .filter(entries -> Policy.JsonFields.IMPORTS.getPointer().equals(entries.asPointer()))
+                .map(entries -> path.nextLevel())
+                .flatMap(JsonPointer::getRoot)
+                .map(JsonKey::toString)
+                .map(PolicyId::of)
                 .orElseThrow(() -> JsonParseException.newBuilder().build());
     }
 

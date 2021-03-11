@@ -24,11 +24,14 @@ import org.eclipse.ditto.protocoladapter.Adaptable;
 import org.eclipse.ditto.protocoladapter.JsonifiableMapper;
 import org.eclipse.ditto.signals.commands.policies.modify.CreatePolicyResponse;
 import org.eclipse.ditto.signals.commands.policies.modify.DeletePolicyEntryResponse;
+import org.eclipse.ditto.signals.commands.policies.modify.DeletePolicyImportResponse;
 import org.eclipse.ditto.signals.commands.policies.modify.DeletePolicyResponse;
 import org.eclipse.ditto.signals.commands.policies.modify.DeleteResourceResponse;
 import org.eclipse.ditto.signals.commands.policies.modify.DeleteSubjectResponse;
 import org.eclipse.ditto.signals.commands.policies.modify.ModifyPolicyEntriesResponse;
 import org.eclipse.ditto.signals.commands.policies.modify.ModifyPolicyEntryResponse;
+import org.eclipse.ditto.signals.commands.policies.modify.ModifyPolicyImportResponse;
+import org.eclipse.ditto.signals.commands.policies.modify.ModifyPolicyImportsResponse;
 import org.eclipse.ditto.signals.commands.policies.modify.ModifyPolicyResponse;
 import org.eclipse.ditto.signals.commands.policies.modify.ModifyResourceResponse;
 import org.eclipse.ditto.signals.commands.policies.modify.ModifyResourcesResponse;
@@ -59,6 +62,8 @@ final class PolicyModifyCommandResponseMappingStrategies
         addPolicyEntryResourceResponses(mappingStrategies);
 
         addPolicyEntrySubjectResponses(mappingStrategies);
+
+        addPolicyImportResponses(mappingStrategies);
 
         return mappingStrategies;
     }
@@ -95,6 +100,19 @@ final class PolicyModifyCommandResponseMappingStrategies
         mappingStrategies.put(ModifyPolicyEntriesResponse.TYPE,
                 adaptable -> ModifyPolicyEntriesResponse.of(policyIdFromTopicPath(adaptable.getTopicPath()),
                         dittoHeadersFrom(adaptable)));
+    }
+    private static void addPolicyImportResponses(
+            final Map<String, JsonifiableMapper<PolicyModifyCommandResponse<?>>> mappingStrategies) {
+
+        mappingStrategies.put(ModifyPolicyImportResponse.TYPE,
+                adaptable -> isCreated(adaptable) ? importCreated(adaptable) : importModified(adaptable));
+
+        mappingStrategies.put(DeletePolicyImportResponse.TYPE,
+                adaptable -> DeletePolicyImportResponse.of(policyIdFromTopicPath(adaptable.getTopicPath()),
+                        importedPolicyIdFrom(adaptable), dittoHeadersFrom(adaptable)));
+
+        mappingStrategies.put(ModifyPolicyImportsResponse.TYPE,
+                adaptable -> isCreated(adaptable) ? importsCreated(adaptable) : importsModified(adaptable));
     }
 
     private static void addPolicyEntryResourceResponses(
@@ -149,6 +167,26 @@ final class PolicyModifyCommandResponseMappingStrategies
     private static ModifyPolicyEntryResponse entryModified(final Adaptable adaptable) {
         final PolicyId policyId = policyIdFromTopicPath(adaptable.getTopicPath());
         return ModifyPolicyEntryResponse.modified(policyId, labelFrom(adaptable), dittoHeadersFrom(adaptable));
+    }
+
+    private static ModifyPolicyImportResponse importCreated(final Adaptable adaptable) {
+        final PolicyId policyId = policyIdFromTopicPath(adaptable.getTopicPath());
+        return ModifyPolicyImportResponse.created(policyId, policyImportFrom(adaptable), dittoHeadersFrom(adaptable));
+    }
+
+    private static ModifyPolicyImportResponse importModified(final Adaptable adaptable) {
+        final PolicyId policyId = policyIdFromTopicPath(adaptable.getTopicPath());
+        return ModifyPolicyImportResponse.modified(policyId, dittoHeadersFrom(adaptable));
+    }
+
+    private static ModifyPolicyImportsResponse importsCreated(final Adaptable adaptable) {
+        final PolicyId policyId = policyIdFromTopicPath(adaptable.getTopicPath());
+        return ModifyPolicyImportsResponse.created(policyId, policyImportsFrom(adaptable), dittoHeadersFrom(adaptable));
+    }
+
+    private static ModifyPolicyImportsResponse importsModified(final Adaptable adaptable) {
+        final PolicyId policyId = policyIdFromTopicPath(adaptable.getTopicPath());
+        return ModifyPolicyImportsResponse.modified(policyId, dittoHeadersFrom(adaptable));
     }
 
     private static ModifyResourceResponse resourceCreated(final Adaptable adaptable) {
