@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Contributors to the Eclipse Foundation
+ * Copyright (c) 2021 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -23,7 +23,6 @@ import org.eclipse.ditto.model.base.headers.DittoHeaders;
 import org.eclipse.ditto.model.base.headers.DittoHeadersBuilder;
 import org.eclipse.ditto.model.base.headers.WithDittoHeaders;
 import org.eclipse.ditto.model.base.headers.entitytag.EntityTag;
-import org.eclipse.ditto.model.policies.PoliciesModelFactory;
 import org.eclipse.ditto.model.policies.Policy;
 import org.eclipse.ditto.model.policies.PolicyBuilder;
 import org.eclipse.ditto.model.policies.PolicyEntry;
@@ -58,11 +57,9 @@ final class CreatePolicyStrategy extends AbstractPolicyCommandStrategy<CreatePol
         // Policy not yet created - do so ..
         final Policy newPolicy = command.getPolicy();
         final DittoHeadersBuilder<? ,?> adjustedHeadersBuilder = command.getDittoHeaders().toBuilder();
-        final Set<PolicyEntry> adjustedEntries = potentiallyAdjustPolicyEntries(command.getPolicy().getEntriesSet()
-        );
+        final Set<PolicyEntry> adjustedEntries = potentiallyAdjustPolicyEntries(command.getPolicy().getEntriesSet());
         final DittoHeaders adjustedHeaders = adjustedHeadersBuilder.build();
-        final PolicyBuilder newPolicyBuilder = PoliciesModelFactory.newPolicyBuilder(
-                newPolicy.getEntityId().orElseThrow(), adjustedEntries);
+        final PolicyBuilder newPolicyBuilder = newPolicy.toBuilder().setId(newPolicy.getEntityId().orElseThrow()).setAll(adjustedEntries);
 
         final Policy adjustedPolicy = newPolicyBuilder.build();
         final CreatePolicy adjustedCommand = CreatePolicy.of(adjustedPolicy, adjustedHeaders);

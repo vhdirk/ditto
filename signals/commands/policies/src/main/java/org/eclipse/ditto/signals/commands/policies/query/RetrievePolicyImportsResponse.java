@@ -15,6 +15,7 @@ package org.eclipse.ditto.signals.commands.policies.query;
 import static org.eclipse.ditto.model.base.common.ConditionChecker.checkNotNull;
 
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Predicate;
 
 import javax.annotation.Nullable;
@@ -76,11 +77,13 @@ public final class RetrievePolicyImportsResponse extends AbstractCommandResponse
      * @return the response.
      * @throws NullPointerException if any argument is {@code null}.
      */
-    public static RetrievePolicyImportsResponse of(final PolicyId policyId, final PolicyImports policyImports,
+    public static RetrievePolicyImportsResponse of(final PolicyId policyId, final Optional<PolicyImports> policyImports,
             final DittoHeaders dittoHeaders) {
 
         return new RetrievePolicyImportsResponse(policyId, HttpStatus.OK,
-                policyImports.toJson(dittoHeaders.getSchemaVersion().orElse(JsonSchemaVersion.LATEST)), dittoHeaders);
+                policyImports.map(imports ->
+                    imports.toJson(dittoHeaders.getSchemaVersion().orElse(JsonSchemaVersion.LATEST))).orElse(JsonFactory.newObject()),
+                dittoHeaders);
     }
 
     /**

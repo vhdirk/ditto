@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Contributors to the Eclipse Foundation
+ * Copyright (c) 2021 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -176,12 +176,12 @@ final class PolicyModifyCommandResponseMappingStrategies
 
     private static ModifyPolicyImportResponse importModified(final Adaptable adaptable) {
         final PolicyId policyId = policyIdFromTopicPath(adaptable.getTopicPath());
-        return ModifyPolicyImportResponse.modified(policyId, dittoHeadersFrom(adaptable));
+        return ModifyPolicyImportResponse.modified(policyId, importedPolicyIdFrom(adaptable), dittoHeadersFrom(adaptable));
     }
 
     private static ModifyPolicyImportsResponse importsCreated(final Adaptable adaptable) {
         final PolicyId policyId = policyIdFromTopicPath(adaptable.getTopicPath());
-        return ModifyPolicyImportsResponse.created(policyId, policyImportsFrom(adaptable), dittoHeadersFrom(adaptable));
+        return ModifyPolicyImportsResponse.created(policyId, policyImportsFrom(adaptable).orElse(null), dittoHeadersFrom(adaptable));
     }
 
     private static ModifyPolicyImportsResponse importsModified(final Adaptable adaptable) {

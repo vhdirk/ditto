@@ -114,6 +114,18 @@ final class ImmutablePolicyImports implements PolicyImports {
         return result;
     }
 
+    @Override
+    public PolicyImports setPolicyImports(final PolicyImports policyImports) {
+        checkNotNull(policyImports, "policy imports to set");
+
+        PolicyImports result = this;
+        for (PolicyImport policyImport : policyImports) {
+            result = this.setPolicyImport(policyImport);
+        }
+        return result;
+    }
+
+
     private PolicyImports createNewPolicyImportsWithNewPolicyImport(final PolicyImport newPolicyImport) {
         final Map<CharSequence, PolicyImport> resourcesCopy = copyPolicyImports();
         resourcesCopy.put(newPolicyImport.getImportedPolicyId(), newPolicyImport);

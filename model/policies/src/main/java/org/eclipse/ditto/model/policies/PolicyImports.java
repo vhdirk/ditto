@@ -82,6 +82,16 @@ public interface PolicyImports extends Iterable<PolicyImport>, Jsonifiable.WithF
     PolicyImports setPolicyImport(PolicyImport policyImport);
 
     /**
+     * Merges all given policyImports with self into a copy of this policy. A previous PolicyImport with the same identifier will be
+     * overwritten.
+     *
+     * @param policyImports the PolicyImports to be set.
+     * @return a copy of this PolicyImports with {@code policyImport} set.
+     * @throws NullPointerException if {@code policyImport} is {@code null}.
+     */
+    PolicyImports setPolicyImports(PolicyImports policyImports);
+
+    /**
      * Removes the PolicyImport with the given imported Policy ID.
      *
      * @param importedPolicyId the Policy ID identifying the PolicyImport to remove.

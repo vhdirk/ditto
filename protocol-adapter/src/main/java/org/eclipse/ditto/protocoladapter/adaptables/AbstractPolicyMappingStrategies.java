@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Contributors to the Eclipse Foundation
+ * Copyright (c) 2021 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -15,6 +15,7 @@ package org.eclipse.ditto.protocoladapter.adaptables;
 import static org.eclipse.ditto.model.base.common.ConditionChecker.checkNotNull;
 
 import java.util.Map;
+import java.util.Optional;
 
 import org.eclipse.ditto.json.JsonField;
 import org.eclipse.ditto.json.JsonKey;
@@ -107,9 +108,13 @@ abstract class AbstractPolicyMappingStrategies<T extends Jsonifiable.WithPredica
      * @param adaptable the adaptable
      * @return the policy imports
      */
-    protected static PolicyImports policyImportsFrom(final Adaptable adaptable) {
-        final JsonObject value = getValueFromPayload(adaptable);
-        return PoliciesModelFactory.newPolicyImports(value);
+    protected static Optional<PolicyImports> policyImportsFrom(final Adaptable adaptable) {
+        try {
+            final JsonObject value = getValueFromPayload(adaptable);
+            return Optional.ofNullable(PoliciesModelFactory.newPolicyImports(value));
+        } catch (final NullPointerException ex){
+            return Optional.empty();
+        }
     }
 
     /**

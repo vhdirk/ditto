@@ -24,11 +24,14 @@ import org.eclipse.ditto.model.base.auth.AuthorizationContext;
 import org.eclipse.ditto.model.base.auth.AuthorizationSubject;
 import org.eclipse.ditto.model.base.auth.DittoAuthorizationContextType;
 import org.eclipse.ditto.model.base.headers.DittoHeaders;
+import org.eclipse.ditto.model.policies.EffectedImports;
 import org.eclipse.ditto.model.policies.EffectedPermissions;
 import org.eclipse.ditto.model.policies.Label;
 import org.eclipse.ditto.model.policies.PoliciesModelFactory;
 import org.eclipse.ditto.model.policies.PolicyEntry;
 import org.eclipse.ditto.model.policies.PolicyId;
+import org.eclipse.ditto.model.policies.PolicyImport;
+import org.eclipse.ditto.model.policies.PolicyImports;
 import org.eclipse.ditto.model.policies.PolicyRevision;
 import org.eclipse.ditto.model.policies.Resource;
 import org.eclipse.ditto.model.policies.ResourceKey;
@@ -174,6 +177,21 @@ final class TestConstants {
          * A known identifier for a {@code Policy}.
          */
         public static final PolicyId POLICY_ID = PolicyId.of("org.eclipse.ditto.example", "myPolicy");
+
+        /**
+         * A known identifier for a {@code Policy}.
+         */
+        public static final PolicyId IMPORTED_POLICY_ID = PolicyId.of("org.eclipse.ditto.example", "mySupportPolicy");
+
+        /**
+         * A known {@code PolicyImport} for a {@code Policy}.
+         */
+        public static final PolicyImport POLICY_IMPORT = PolicyImport.newInstance(IMPORTED_POLICY_ID, false, EffectedImports.newInstance(null, null));
+
+        /**
+         * A known {@code PolicyImports} for a {@code Policy}.
+         */
+        public static final PolicyImports POLICY_IMPORTS = PolicyImports.newInstance(POLICY_IMPORT);
 
         /**
          * A known revision number of a Policy.

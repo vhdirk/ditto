@@ -60,42 +60,51 @@ public final class ModifyPolicyImportResponse extends AbstractCommandResponse<Mo
 
     private final PolicyId policyId;
     @Nullable private final PolicyImport policyImportCreated;
+    @Nullable private final PolicyId importedPolicyIdCreated;
 
     private ModifyPolicyImportResponse(final PolicyId policyId,
             final HttpStatus statusCode,
             @Nullable final PolicyImport policyImportCreated,
+            @Nullable final PolicyId importedPolicyId,
             final DittoHeaders dittoHeaders) {
 
         super(TYPE, statusCode, dittoHeaders);
         this.policyId = checkNotNull(policyId, "Policy ID");
         this.policyImportCreated = policyImportCreated;
+        this.importedPolicyIdCreated = importedPolicyId;
     }
 
     /**
      * Creates a response to a {@code ModifyPolicyImport} command.
      *
-     * @param policyId the Policy ID of the created policy entry.
+     * @param policyId the Policy ID of the created policy import.
      * @param policyImportCreated (optional) the PolicyImport created.
-     * @param dittoHeaders the headers of the preceding command.
-     * @return the response.
-     * @throws NullPointerException if {@code statusCode} or {@code dittoHeaders} is {@code null}.
-     */
-    public static ModifyPolicyImportResponse created(final PolicyId policyId, final PolicyImport policyImportCreated,
-            final DittoHeaders dittoHeaders) {
-
-        return new ModifyPolicyImportResponse(policyId, HttpStatus.CREATED, policyImportCreated, dittoHeaders);
-    }
-
-    /**
-     * Creates a response to a {@code ModifyPolicyImport} command.
-     *
-     * @param policyId the Policy ID of the modified policy entry.
      * @param dittoHeaders the headers of the preceding command.
      * @return the response.
      * @throws NullPointerException if any argument is {@code null}.
      */
-    public static ModifyPolicyImportResponse modified(final PolicyId policyId, final DittoHeaders dittoHeaders) {
-        return new ModifyPolicyImportResponse(policyId, HttpStatus.NO_CONTENT, null, dittoHeaders);
+    public static ModifyPolicyImportResponse created(final PolicyId policyId, final PolicyImport policyImportCreated,
+            final DittoHeaders dittoHeaders) {
+
+        return new ModifyPolicyImportResponse(policyId,
+                HttpStatus.CREATED,
+                checkNotNull(policyImportCreated, "policyImportCreated"),
+                policyImportCreated.getImportedPolicyId(),
+                dittoHeaders);
+    }
+
+    /**
+     * Creates a response to a {@code ModifyPolicyImport} command.
+     *
+     * @param policyId the Policy ID of the modified policy import.
+     * @param importedPolicyId the id of the modified policy import.
+     * @param dittoHeaders the headers of the preceding command.
+     * @return the response.
+     * @throws NullPointerException if {@code policyId} or {@code dittoHeaders} is {@code null}.
+     */
+    public static ModifyPolicyImportResponse modified(final PolicyId policyId, @Nullable final PolicyId importedPolicyId,
+            final DittoHeaders dittoHeaders) {
+        return new ModifyPolicyImportResponse(policyId, HttpStatus.NO_CONTENT, null, importedPolicyId, dittoHeaders);
     }
 
     /**
@@ -136,7 +145,8 @@ public final class ModifyPolicyImportResponse extends AbstractCommandResponse<Mo
                             .orElse(null);
 
                     return new ModifyPolicyImportResponse(policyId, statusCode, extractedPolicyImportCreated,
-                            dittoHeaders);
+                        extractedPolicyImportCreated.getImportedPolicyId(),
+                        dittoHeaders);
                 });
     }
 
@@ -179,7 +189,7 @@ public final class ModifyPolicyImportResponse extends AbstractCommandResponse<Mo
     @Override
     public ModifyPolicyImportResponse setDittoHeaders(final DittoHeaders dittoHeaders) {
         return (policyImportCreated != null) ? created(policyId, policyImportCreated, dittoHeaders) :
-                modified(policyId, dittoHeaders);
+                modified(policyId, null, dittoHeaders);
     }
 
     @Override
