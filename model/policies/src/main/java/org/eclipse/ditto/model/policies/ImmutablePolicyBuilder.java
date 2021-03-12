@@ -156,11 +156,7 @@ final class ImmutablePolicyBuilder implements PolicyBuilder {
 
     @Override
     public ImmutablePolicyBuilder setImports(@Nullable final PolicyImports imports) {
-        if (this.imports == null) {
-            this.imports = imports;
-            return this;
-        }
-        this.imports = this.imports.setPolicyImports(imports);
+        this.imports = imports;
         return this;
     }
 

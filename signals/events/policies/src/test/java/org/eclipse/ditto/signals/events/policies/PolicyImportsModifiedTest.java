@@ -20,7 +20,7 @@ import static org.mutabilitydetector.unittesting.MutabilityMatchers.areImmutable
 import org.eclipse.ditto.json.JsonFactory;
 import org.eclipse.ditto.json.JsonObject;
 import org.eclipse.ditto.model.base.json.FieldType;
-import org.eclipse.ditto.model.policies.PolicyEntry;
+import org.eclipse.ditto.model.policies.PolicyImports;
 import org.eclipse.ditto.model.policies.PolicyId;
 import org.eclipse.ditto.signals.events.base.Event;
 import org.junit.Test;
@@ -44,7 +44,7 @@ public final class PolicyImportsModifiedTest {
     @Test
     public void assertImmutability() {
         assertInstancesOf(PolicyImportsModified.class, areImmutable(),
-                provided(Iterable.class, PolicyEntry.class).isAlsoImmutable());
+                provided(PolicyImports.class).isAlsoImmutable());
     }
 
 

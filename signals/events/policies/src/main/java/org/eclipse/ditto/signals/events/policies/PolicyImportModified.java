@@ -57,7 +57,7 @@ public final class PolicyImportModified extends AbstractPolicyEvent<PolicyImport
     public static final String TYPE = TYPE_PREFIX + NAME;
 
     static final JsonFieldDefinition<String> JSON_IMPORTED_POLICY_ID =
-            JsonFactory.newStringFieldDefinition("policyId", FieldType.REGULAR, JsonSchemaVersion.V_2);
+            JsonFactory.newStringFieldDefinition("importedPolicyId", FieldType.REGULAR, JsonSchemaVersion.V_2);
 
     static final JsonFieldDefinition<JsonObject> JSON_POLICY_IMPORT =
             JsonFactory.newJsonObjectFieldDefinition("policyImport", FieldType.REGULAR, JsonSchemaVersion.V_2);
@@ -90,30 +90,6 @@ public final class PolicyImportModified extends AbstractPolicyEvent<PolicyImport
             final DittoHeaders dittoHeaders) {
 
         return of(policyId, policyImport, revision, null, dittoHeaders);
-    }
-
-    /**
-     * Constructs a new {@code PolicyImportModified} object indicating the creation of the import.
-     *
-     * @param policyId the identifier of the Policy to which the modified import belongs
-     * @param policyImport the modified {@link PolicyImport}
-     * @param revision the revision of the Policy.
-     * @param timestamp the timestamp of this event.
-     * @param dittoHeaders the headers of the command which was the cause of this event.
-     * @return the created PolicyImportModified.
-     * @throws NullPointerException if any argument but {@code timestamp} is {@code null}.
-     * @deprecated Policy ID is now typed. Use
-     * {@link #of(org.eclipse.ditto.model.policies.PolicyId, org.eclipse.ditto.model.policies.PolicyImport, long, java.time.Instant, org.eclipse.ditto.model.base.headers.DittoHeaders)}
-     * instead.
-     */
-    @Deprecated
-    public static PolicyImportModified of(final String policyId,
-            final PolicyImport policyImport,
-            final long revision,
-            @Nullable final Instant timestamp,
-            final DittoHeaders dittoHeaders) {
-
-        return of(PolicyId.of(policyId), policyImport, revision, timestamp, dittoHeaders);
     }
 
     /**

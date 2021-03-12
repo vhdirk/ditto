@@ -76,17 +76,17 @@ public final class ModifyPolicyImports extends AbstractCommand<ModifyPolicyImpor
      * Creates a command for modifying {@code PolicyImports}.
      *
      * @param policyId the identifier of the Policy.
-     * @param policyEntries the new PolicyEntries.
+     * @param policyImports the new PolicyImports.
      * @param dittoHeaders the headers of the command.
      * @return the command.
      * @throws NullPointerException if any argument is {@code null}.
      */
-    public static ModifyPolicyImports of(final PolicyId policyId, final PolicyImports policyEntries,
+    public static ModifyPolicyImports of(final PolicyId policyId, final PolicyImports policyImports,
             final DittoHeaders dittoHeaders) {
 
         Objects.requireNonNull(policyId, "The Policy identifier must not be null!");
-        Objects.requireNonNull(policyEntries, "The PolicyEntries must not be null!");
-        return new ModifyPolicyImports(policyId, policyEntries, dittoHeaders);
+        Objects.requireNonNull(policyImports, "The PolicyImports must not be null!");
+        return new ModifyPolicyImports(policyId, policyImports, dittoHeaders);
     }
 
     /**

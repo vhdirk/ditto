@@ -12,19 +12,17 @@
  */
 package org.eclipse.ditto.services.policies.persistence.actors.strategies.events;
 
+import org.eclipse.ditto.model.policies.Policy;
 import org.eclipse.ditto.model.policies.PolicyBuilder;
-import org.eclipse.ditto.signals.events.policies.PolicyEntryDeleted;
+import org.eclipse.ditto.signals.events.policies.PolicyImportDeleted;
 
 /**
- * This strategy handles {@link org.eclipse.ditto.signals.events.policies.PolicyEntryDeleted} events.
+ * This strategy handles {@link org.eclipse.ditto.signals.events.policies.PolicyImportDeleted} events.
  */
-final class PolicyEntryDeletedStrategy extends AbstractPolicyEventStrategy<PolicyEntryDeleted> {
+final class PolicyImportDeletedStrategy extends AbstractPolicyEventStrategy<PolicyImportDeleted> {
 
     @Override
-    protected PolicyBuilder applyEvent(final PolicyEntryDeleted ped, final PolicyBuilder policyBuilder) {
-        // TODO: DVH: Can I just create PolicyBuilder::getImports for this?
-        return policyBuilder; //.setImports(PolicyImports.newInstance(pem.getPolicyImport()));
-
+    protected PolicyBuilder applyEvent(final PolicyImportDeleted pid, final Policy policy, final PolicyBuilder policyBuilder) {
+        return policyBuilder.setImports(policy.getImports().map(policyImports -> policyImports.removePolicyImport(pid.getImportedPolicyId())).orElse(null));
     }
-
 }

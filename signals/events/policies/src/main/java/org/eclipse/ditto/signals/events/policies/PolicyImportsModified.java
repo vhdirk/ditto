@@ -100,30 +100,6 @@ public final class PolicyImportsModified extends AbstractPolicyEvent<PolicyImpor
      * @param dittoHeaders the headers of the command which was the cause of this event.
      * @return the created PolicyImportsModified.
      * @throws NullPointerException if any argument but {@code timestamp} is {@code null}.
-     * @deprecated Policy ID is now typed. Use
-     * {@link #of(org.eclipse.ditto.model.policies.PolicyId, Iterable, long, java.time.Instant, org.eclipse.ditto.model.base.headers.DittoHeaders)}
-     * instead.
-     */
-    @Deprecated
-    public static PolicyImportsModified of(final String policyId,
-            final PolicyImports policyImports,
-            final long revision,
-            @Nullable final Instant timestamp,
-            final DittoHeaders dittoHeaders) {
-
-        return of(PolicyId.of(policyId), policyImports, revision, timestamp, dittoHeaders);
-    }
-
-    /**
-     * Constructs a new {@code PolicyImportsModified} object indicating the modification of the entries.
-     *
-     * @param policyId the identifier of the Policy to which the modified import belongs
-     * @param policyImports the modified {@link PolicyImport}s.
-     * @param revision the revision of the Policy.
-     * @param timestamp the timestamp of this event.
-     * @param dittoHeaders the headers of the command which was the cause of this event.
-     * @return the created PolicyImportsModified.
-     * @throws NullPointerException if any argument but {@code timestamp} is {@code null}.
      */
     public static PolicyImportsModified of(final PolicyId policyId,
             final PolicyImports policyImports,
@@ -188,7 +164,7 @@ public final class PolicyImportsModified extends AbstractPolicyEvent<PolicyImpor
 
     @Override
     public JsonPointer getResourcePath() {
-        return JsonPointer.of("/entries");
+        return JsonPointer.of("/imports");
     }
 
     @Override

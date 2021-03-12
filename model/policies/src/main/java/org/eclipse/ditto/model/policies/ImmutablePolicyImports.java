@@ -120,7 +120,7 @@ final class ImmutablePolicyImports implements PolicyImports {
 
         PolicyImports result = this;
         for (PolicyImport policyImport : policyImports) {
-            result = this.setPolicyImport(policyImport);
+            result = result.setPolicyImport(policyImport);
         }
         return result;
     }

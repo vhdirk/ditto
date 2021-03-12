@@ -787,7 +787,7 @@ public final class PoliciesModelFactory {
     /**
      * Returns a new {@link PolicyImport} with the specified {@code importedPolicyId} and {@code effectedImportedEntries}.
      *
-     * @param importedPolicyId TODO TJ doc
+     * @param importedPolicyId The {@link PolicyId} of the imported policy
      * @param isProtected
      * @return the new {@link PolicyImport}.
      * @throws NullPointerException if any argument is {@code null}.
@@ -799,7 +799,7 @@ public final class PoliciesModelFactory {
     /**
      * Returns a new {@link PolicyImport} with the specified {@code importedPolicyId} and {@code effectedImports}.
      *
-     * @param importedPolicyId TODO TJ doc
+     * @param importedPolicyId The {@link PolicyId} of the imported policy
      * @param isProtected
      * @param effectedImports
      * @return the new {@link PolicyImport}.
@@ -813,7 +813,7 @@ public final class PoliciesModelFactory {
     /**
      * Returns a new immutable {@link PolicyImport} based on the given JSON object.
      *
-     * @param importedPolicyId TODO TJ doc
+     * @param importedPolicyId The {@link PolicyId} of the imported policy
      * @param jsonObject the JSON object representation of a PolicyImport.
      * @return the new Policy import.
      * @throws NullPointerException if {@code jsonObject} is {@code null}.

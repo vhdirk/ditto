@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Contributors to the Eclipse Foundation
+ * Copyright (c) 2021 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -102,7 +102,7 @@ final class ModifyPolicyImportStrategy extends AbstractPolicyCommandStrategy<Mod
 
         final PolicyEvent<?> eventToPersist;
         final ModifyPolicyImportResponse createdOrModifiedResponse;
-        if (nonNullPolicy.contains(importedPolicyId)) {
+        if (nonNullPolicy.getImports().map(policyImports -> policyImports.getPolicyImport(importedPolicyId).isPresent()).orElse(false)) {
             eventToPersist =
                     PolicyImportModified.of(policyId,
                             policyImport, nextRevision, getEventTimestamp(),

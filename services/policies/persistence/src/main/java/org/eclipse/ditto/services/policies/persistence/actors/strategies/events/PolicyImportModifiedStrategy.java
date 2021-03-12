@@ -12,6 +12,7 @@
  */
 package org.eclipse.ditto.services.policies.persistence.actors.strategies.events;
 
+import org.eclipse.ditto.model.policies.Policy;
 import org.eclipse.ditto.model.policies.PolicyBuilder;
 import org.eclipse.ditto.model.policies.PolicyImports;
 import org.eclipse.ditto.signals.events.policies.PolicyImportModified;
@@ -22,9 +23,11 @@ import org.eclipse.ditto.signals.events.policies.PolicyImportModified;
 final class PolicyImportModifiedStrategy extends AbstractPolicyEventStrategy<PolicyImportModified> {
 
     @Override
-    protected PolicyBuilder applyEvent(final PolicyImportModified pem, final PolicyBuilder policyBuilder) {
-        // TODO: DVH: Verify if the builder already contains the previous imports
-        return policyBuilder.setImports(PolicyImports.newInstance(pem.getPolicyImport()));
+    protected PolicyBuilder applyEvent(final PolicyImportModified pim, final Policy policy, final PolicyBuilder policyBuilder) {
+        return policyBuilder.setImports(
+            policy.getImports()
+                .map(policyImports -> policyImports.setPolicyImport(pim.getPolicyImport()))
+                .orElse(PolicyImports.newInstance(pim.getPolicyImport())));
     }
 
 }
