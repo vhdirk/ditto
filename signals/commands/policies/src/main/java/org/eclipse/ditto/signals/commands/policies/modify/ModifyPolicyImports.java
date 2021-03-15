@@ -12,6 +12,8 @@
  */
 package org.eclipse.ditto.signals.commands.policies.modify;
 
+import static org.eclipse.ditto.model.base.common.ConditionChecker.checkNotNull;
+
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -39,6 +41,8 @@ import org.eclipse.ditto.signals.commands.policies.PolicyCommandSizeValidator;
 
 /**
  * This command modifies {@link PolicyImports}.
+ *
+ * @since 2.1.0
  */
 @Immutable
 @JsonParsableCommand(typePrefix = ModifyPolicyImports.TYPE_PREFIX, name = ModifyPolicyImports.NAME)
@@ -84,8 +88,8 @@ public final class ModifyPolicyImports extends AbstractCommand<ModifyPolicyImpor
     public static ModifyPolicyImports of(final PolicyId policyId, final PolicyImports policyImports,
             final DittoHeaders dittoHeaders) {
 
-        Objects.requireNonNull(policyId, "The Policy identifier must not be null!");
-        Objects.requireNonNull(policyImports, "The PolicyImports must not be null!");
+        checkNotNull(policyId, "policyId");
+        checkNotNull(policyImports, "policyImports");
         return new ModifyPolicyImports(policyId, policyImports, dittoHeaders);
     }
 
@@ -182,8 +186,10 @@ public final class ModifyPolicyImports extends AbstractCommand<ModifyPolicyImpor
             return false;
         }
         final ModifyPolicyImports that = (ModifyPolicyImports) obj;
-        return that.canEqual(this) && Objects.equals(policyId, that.policyId)
-                && Objects.equals(policyImports, that.policyImports) && super.equals(obj);
+        return that.canEqual(this) &&
+                Objects.equals(policyId, that.policyId) &&
+                Objects.equals(policyImports, that.policyImports) &&
+                super.equals(obj);
     }
 
     @SuppressWarnings("squid:S109")
@@ -194,8 +200,10 @@ public final class ModifyPolicyImports extends AbstractCommand<ModifyPolicyImpor
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + " [" + super.toString() + ", policyId=" + policyId + ", policyImports="
-                + policyImports + "]";
+        return getClass().getSimpleName() + " [" + super.toString() +
+                ", policyId=" + policyId +
+                ", policyImports=" + policyImports +
+                "]";
     }
 
 }

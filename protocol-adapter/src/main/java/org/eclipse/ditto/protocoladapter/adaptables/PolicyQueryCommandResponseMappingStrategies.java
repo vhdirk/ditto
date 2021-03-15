@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Contributors to the Eclipse Foundation
+ * Copyright (c) 2020 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -84,8 +84,7 @@ final class PolicyQueryCommandResponseMappingStrategies
 
         mappingStrategies.put(RetrievePolicyImportsResponse.TYPE,
                 adaptable -> RetrievePolicyImportsResponse.of(policyIdFromTopicPath(adaptable.getTopicPath()),
-                        policyImportsFrom(adaptable),
-                        dittoHeadersFrom(adaptable)));
+                        policyImportsFrom(adaptable), dittoHeadersFrom(adaptable)));
     }
 
     private static void addPolicyEntryResourceResponses(

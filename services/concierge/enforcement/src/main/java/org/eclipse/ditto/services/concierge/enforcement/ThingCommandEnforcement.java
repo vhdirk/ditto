@@ -1256,6 +1256,7 @@ public final class ThingCommandEnforcement
          * @param thingsShardRegion the ActorRef to the Things shard region.
          * @param policiesShardRegion the ActorRef to the Policies shard region.
          * @param thingIdCache the thing-id-cache.
+         * @param policyCache the policy cache.
          * @param policyEnforcerCache the policy-enforcer cache.
          * @param aclEnforcerCache the acl-enforcer cache.
          * @param preEnforcer pre-enforcer function to block undesirable messages to policies shard region.

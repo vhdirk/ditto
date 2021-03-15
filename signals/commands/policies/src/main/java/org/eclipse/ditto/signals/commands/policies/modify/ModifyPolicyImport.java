@@ -12,6 +12,8 @@
  */
 package org.eclipse.ditto.signals.commands.policies.modify;
 
+import static org.eclipse.ditto.model.base.common.ConditionChecker.checkNotNull;
+
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -39,6 +41,8 @@ import org.eclipse.ditto.signals.commands.policies.PolicyCommandSizeValidator;
 
 /**
  * This command modifies a {@link PolicyImport}.
+ *
+ * @since 2.1.0
  */
 @Immutable
 @JsonParsableCommand(typePrefix = ModifyPolicyImport.TYPE_PREFIX, name = ModifyPolicyImport.NAME)
@@ -64,7 +68,8 @@ public final class ModifyPolicyImport extends AbstractCommand<ModifyPolicyImport
     private final PolicyId policyId;
     private final PolicyImport policyImport;
 
-    private ModifyPolicyImport(final PolicyId policyId, final PolicyImport policyImport, final DittoHeaders dittoHeaders) {
+    private ModifyPolicyImport(final PolicyId policyId, final PolicyImport policyImport,
+            final DittoHeaders dittoHeaders) {
         super(TYPE, dittoHeaders);
         this.policyId = policyId;
         this.policyImport = policyImport;
@@ -85,8 +90,8 @@ public final class ModifyPolicyImport extends AbstractCommand<ModifyPolicyImport
     public static ModifyPolicyImport of(final PolicyId policyId, final PolicyImport policyImport,
             final DittoHeaders dittoHeaders) {
 
-        Objects.requireNonNull(policyId, "The Policy identifier must not be null!");
-        Objects.requireNonNull(policyImport, "The PolicyImport must not be null!");
+        checkNotNull(policyId, "policyId");
+        checkNotNull(policyImport, "policyImport");
         return new ModifyPolicyImport(policyId, policyImport, dittoHeaders);
     }
 
@@ -188,8 +193,10 @@ public final class ModifyPolicyImport extends AbstractCommand<ModifyPolicyImport
             return false;
         }
         final ModifyPolicyImport that = (ModifyPolicyImport) obj;
-        return that.canEqual(this) && Objects.equals(policyId, that.policyId)
-                && Objects.equals(policyImport, that.policyImport) && super.equals(obj);
+        return that.canEqual(this) &&
+                Objects.equals(policyId, that.policyId) &&
+                Objects.equals(policyImport, that.policyImport) &&
+                super.equals(obj);
     }
 
     @SuppressWarnings("squid:S109")
@@ -200,8 +207,9 @@ public final class ModifyPolicyImport extends AbstractCommand<ModifyPolicyImport
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + " [" + super.toString() + ", policyId=" + policyId + ", policyImport="
-                + policyImport + "]";
+        return getClass().getSimpleName() + " [" + super.toString() +
+                ", policyId=" + policyId +
+                ", policyImport=" + policyImport + "]";
     }
 
 }

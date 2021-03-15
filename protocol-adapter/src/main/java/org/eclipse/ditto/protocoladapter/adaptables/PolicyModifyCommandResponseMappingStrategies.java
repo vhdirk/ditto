@@ -101,6 +101,7 @@ final class PolicyModifyCommandResponseMappingStrategies
                 adaptable -> ModifyPolicyEntriesResponse.of(policyIdFromTopicPath(adaptable.getTopicPath()),
                         dittoHeadersFrom(adaptable)));
     }
+
     private static void addPolicyImportResponses(
             final Map<String, JsonifiableMapper<PolicyModifyCommandResponse<?>>> mappingStrategies) {
 
@@ -176,12 +177,14 @@ final class PolicyModifyCommandResponseMappingStrategies
 
     private static ModifyPolicyImportResponse importModified(final Adaptable adaptable) {
         final PolicyId policyId = policyIdFromTopicPath(adaptable.getTopicPath());
-        return ModifyPolicyImportResponse.modified(policyId, importedPolicyIdFrom(adaptable), dittoHeadersFrom(adaptable));
+        return ModifyPolicyImportResponse.modified(policyId, importedPolicyIdFrom(adaptable),
+                dittoHeadersFrom(adaptable));
     }
 
     private static ModifyPolicyImportsResponse importsCreated(final Adaptable adaptable) {
         final PolicyId policyId = policyIdFromTopicPath(adaptable.getTopicPath());
-        return ModifyPolicyImportsResponse.created(policyId, policyImportsFrom(adaptable).orElse(null), dittoHeadersFrom(adaptable));
+        return ModifyPolicyImportsResponse.created(policyId, policyImportsFrom(adaptable),
+                dittoHeadersFrom(adaptable));
     }
 
     private static ModifyPolicyImportsResponse importsModified(final Adaptable adaptable) {

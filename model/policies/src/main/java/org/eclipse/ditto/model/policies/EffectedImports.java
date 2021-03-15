@@ -27,6 +27,8 @@ import org.eclipse.ditto.model.base.json.Jsonifiable;
 
 /**
  * Holds {@link ImportedLabels} for {@link ImportedEffect}s (included/excluded).
+ *
+ * @since 2.1.0
  */
 public interface EffectedImports extends Jsonifiable.WithFieldSelectorAndPredicate<JsonField> {
 

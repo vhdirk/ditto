@@ -34,16 +34,18 @@ import org.eclipse.ditto.model.base.json.FieldType;
 import org.eclipse.ditto.model.base.json.JsonParsableEvent;
 import org.eclipse.ditto.model.base.json.JsonSchemaVersion;
 import org.eclipse.ditto.model.policies.PoliciesModelFactory;
+import org.eclipse.ditto.model.policies.PolicyId;
 import org.eclipse.ditto.model.policies.PolicyImport;
 import org.eclipse.ditto.model.policies.PolicyImports;
-import org.eclipse.ditto.model.policies.PolicyId;
 import org.eclipse.ditto.signals.events.base.EventJsonDeserializer;
 
 /**
  * This event is emitted after all {@link PolicyImport}s were modified at once.
+ *
+ * @since 2.1.0
  */
 @Immutable
-@JsonParsableEvent(name = PolicyImportsModified.NAME, typePrefix= PolicyImportsModified.TYPE_PREFIX)
+@JsonParsableEvent(name = PolicyImportsModified.NAME, typePrefix = PolicyImportsModified.TYPE_PREFIX)
 public final class PolicyImportsModified extends AbstractPolicyEvent<PolicyImportsModified> implements
         PolicyEvent<PolicyImportsModified> {
 
@@ -68,8 +70,8 @@ public final class PolicyImportsModified extends AbstractPolicyEvent<PolicyImpor
             @Nullable final Instant timestamp,
             final DittoHeaders dittoHeaders) {
 
-        super(TYPE, checkNotNull(policyId, "Policy identifier"), revision, timestamp, dittoHeaders);
-        this.policyImports = checkNotNull(policyImports, "Policy Imports");
+        super(TYPE, checkNotNull(policyId, "policyId"), revision, timestamp, dittoHeaders);
+        this.policyImports = checkNotNull(policyImports, "policyImports");
     }
 
     /**
@@ -159,7 +161,7 @@ public final class PolicyImportsModified extends AbstractPolicyEvent<PolicyImpor
     @Override
     public Optional<JsonValue> getEntity(final JsonSchemaVersion schemaVersion) {
         final JsonObject jsonObject = policyImports.toJson();
-        return Optional.ofNullable(jsonObject);
+        return Optional.of(jsonObject);
     }
 
     @Override
@@ -203,7 +205,9 @@ public final class PolicyImportsModified extends AbstractPolicyEvent<PolicyImpor
             return false;
         }
         final PolicyImportsModified that = (PolicyImportsModified) o;
-        return that.canEqual(this) && Objects.equals(policyImports, that.policyImports) && super.equals(that);
+        return that.canEqual(this) &&
+                Objects.equals(policyImports, that.policyImports) &&
+                super.equals(that);
     }
 
     @Override
@@ -213,7 +217,9 @@ public final class PolicyImportsModified extends AbstractPolicyEvent<PolicyImpor
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + " [" + super.toString() + ", policyImports=" + policyImports + "]";
+        return getClass().getSimpleName() + " [" + super.toString() +
+                ", policyImports=" + policyImports +
+                "]";
     }
 
 }

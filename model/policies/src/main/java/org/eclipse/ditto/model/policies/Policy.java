@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Contributors to the Eclipse Foundation
+ * Copyright (c) 2017 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -188,6 +188,7 @@ public interface Policy extends Iterable<PolicyEntry>, Entity<PolicyRevision> {
      * @return a copy of this Policy which does not contain the identified entries anymore.
      * @throws NullPointerException if {@code labels} is {@code null}.
      * @throws IllegalArgumentException if {@code labels} is empty.
+     * @since 2.1.0
      */
     Policy removeEntries(Iterable<CharSequence> labels);
 
@@ -386,6 +387,7 @@ public interface Policy extends Iterable<PolicyEntry>, Entity<PolicyRevision> {
      * Returns the PolicyImports this Policy has.
      *
      * @return the PolicyImports of this Policy.
+     * @since 2.1.0
      */
     Optional<PolicyImports> getImports();
 
@@ -490,6 +492,7 @@ public interface Policy extends Iterable<PolicyEntry>, Entity<PolicyRevision> {
 
         /**
          * JSON field containing the Policy's imports.
+         * @since 2.1.0
          */
         public static final JsonFieldDefinition<JsonObject> IMPORTS =
                 JsonFactory.newJsonObjectFieldDefinition("imports", FieldType.REGULAR, JsonSchemaVersion.V_2);

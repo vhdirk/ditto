@@ -30,6 +30,8 @@ import org.eclipse.ditto.model.policies.PolicyException;
 /**
  * Thrown if a {@link org.eclipse.ditto.model.policies.PolicyImport} should be modified which was {@code protected}
  * and therefore can never be modified/deleted.
+ *
+ * @since 2.1.0
  */
 @Immutable
 @JsonParsableException(errorCode = PolicyImportProtectedException.ERROR_CODE)

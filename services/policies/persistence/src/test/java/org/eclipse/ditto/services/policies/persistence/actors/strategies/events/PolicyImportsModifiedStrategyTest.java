@@ -18,9 +18,9 @@ import java.time.Instant;
 
 import org.eclipse.ditto.model.base.headers.DittoHeaders;
 import org.eclipse.ditto.model.policies.Policy;
+import org.eclipse.ditto.model.policies.PolicyId;
 import org.eclipse.ditto.model.policies.PolicyImport;
 import org.eclipse.ditto.model.policies.PolicyImports;
-import org.eclipse.ditto.model.policies.PolicyId;
 import org.eclipse.ditto.services.policies.persistence.TestConstants;
 import org.eclipse.ditto.signals.events.policies.PolicyImportsModified;
 

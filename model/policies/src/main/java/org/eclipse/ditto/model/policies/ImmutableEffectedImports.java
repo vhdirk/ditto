@@ -59,9 +59,9 @@ final class ImmutableEffectedImports implements EffectedImports {
             final Iterable<String> excludedImportedLabels) {
 
         final ImportedLabels included =
-                toImportedEntries(toSet(checkNotNull(includedImportedLabels, "included imported labels")));
+                toImportedEntries(toSet(checkNotNull(includedImportedLabels, "includedImportedLabels")));
         final ImportedLabels excluded =
-                toImportedEntries(toSet(checkNotNull(excludedImportedLabels, "excluded imported labels")));
+                toImportedEntries(toSet(checkNotNull(excludedImportedLabels, "excludedImportedLabels")));
 
         return new ImmutableEffectedImports(included, excluded);
     }

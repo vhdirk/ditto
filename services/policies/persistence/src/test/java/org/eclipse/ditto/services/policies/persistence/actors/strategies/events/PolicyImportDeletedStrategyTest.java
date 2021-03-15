@@ -35,7 +35,8 @@ public class PolicyImportDeletedStrategyTest extends AbstractPolicyEventStrategy
     @Override
     PolicyImportDeleted getPolicyEvent(final Instant instant, final Policy policy) {
         final PolicyId policyId = policy.getEntityId().orElseThrow();
-        return PolicyImportDeleted.of(policyId, TestConstants.Policy.POLICY_IMPORT_ID, 10L, instant, DittoHeaders.empty());
+        return PolicyImportDeleted.of(policyId, TestConstants.Policy.POLICY_IMPORT_ID, 10L, instant,
+                DittoHeaders.empty());
     }
 
     @Override

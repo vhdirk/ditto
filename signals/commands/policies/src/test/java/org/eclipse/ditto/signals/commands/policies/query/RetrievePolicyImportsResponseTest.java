@@ -17,8 +17,6 @@ import static org.mutabilitydetector.unittesting.AllowedReason.provided;
 import static org.mutabilitydetector.unittesting.MutabilityAssert.assertInstancesOf;
 import static org.mutabilitydetector.unittesting.MutabilityMatchers.areImmutable;
 
-import java.util.Optional;
-
 import org.eclipse.ditto.json.JsonFactory;
 import org.eclipse.ditto.json.JsonObject;
 import org.eclipse.ditto.model.base.common.HttpStatus;
@@ -63,7 +61,7 @@ public final class RetrievePolicyImportsResponseTest {
     @Test
     public void toJsonReturnsExpected() {
         final RetrievePolicyImportsResponse underTest =
-                RetrievePolicyImportsResponse.of(TestConstants.Policy.POLICY_ID, Optional.of(TestConstants.Policy.POLICY_IMPORTS),
+                RetrievePolicyImportsResponse.of(TestConstants.Policy.POLICY_ID, TestConstants.Policy.POLICY_IMPORTS,
                         EMPTY_DITTO_HEADERS);
         final JsonObject actualJson = underTest.toJson(FieldType.regularOrSpecial());
 

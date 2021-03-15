@@ -70,7 +70,7 @@ public final class CacheFactory {
      * @return the entity ID with resource type object.
      */
     public static EntityIdWithResourceType newEntityId(final String resourceType, final EntityId id,
-            final CacheLookupContext cacheLookupContext) {
+            @Nullable final CacheLookupContext cacheLookupContext) {
         return ImmutableEntityIdWithResourceType.of(resourceType, id, cacheLookupContext);
     }
 

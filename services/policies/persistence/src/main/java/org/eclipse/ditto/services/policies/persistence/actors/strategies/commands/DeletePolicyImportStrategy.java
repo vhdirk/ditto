@@ -29,8 +29,8 @@ import org.eclipse.ditto.services.utils.persistentactors.results.Result;
 import org.eclipse.ditto.services.utils.persistentactors.results.ResultFactory;
 import org.eclipse.ditto.signals.commands.policies.modify.DeletePolicyImport;
 import org.eclipse.ditto.signals.commands.policies.modify.DeletePolicyImportResponse;
-import org.eclipse.ditto.signals.events.policies.PolicyImportDeleted;
 import org.eclipse.ditto.signals.events.policies.PolicyEvent;
+import org.eclipse.ditto.signals.events.policies.PolicyImportDeleted;
 
 /**
  * This strategy handles the {@link org.eclipse.ditto.signals.commands.policies.modify.DeletePolicyImport} command.
@@ -56,11 +56,12 @@ final class DeletePolicyImportStrategy extends AbstractPolicyCommandStrategy<Del
         if (nonNullPolicy.contains(importedPolicyId)) {
             final PolicyImportDeleted policyImportDeleted =
                     PolicyImportDeleted.of(policyId, importedPolicyId, nextRevision, getEventTimestamp(), dittoHeaders);
-            final WithDittoHeaders response = appendETagHeaderIfProvided(command,
+            final WithDittoHeaders<?> response = appendETagHeaderIfProvided(command,
                     DeletePolicyImportResponse.of(policyId, importedPolicyId, dittoHeaders), nonNullPolicy);
             return ResultFactory.newMutationResult(command, policyImportDeleted, response);
         } else {
-            return ResultFactory.newErrorResult(policyImportNotFound(policyId, importedPolicyId, dittoHeaders), command);
+            return ResultFactory.newErrorResult(policyImportNotFound(policyId, importedPolicyId, dittoHeaders),
+                    command);
         }
     }
 
@@ -68,7 +69,7 @@ final class DeletePolicyImportStrategy extends AbstractPolicyCommandStrategy<Del
     public Optional<EntityTag> previousEntityTag(final DeletePolicyImport command,
             @Nullable final Policy previousEntity) {
         return Optional.ofNullable(previousEntity)
-                .flatMap(p -> p.getImports())
+                .flatMap(Policy::getImports)
                 .flatMap(im -> EntityTag.fromEntity(im.getPolicyImport(command.getImportedPolicyId()).orElse(null)));
     }
 

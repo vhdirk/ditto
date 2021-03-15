@@ -16,6 +16,8 @@ import javax.annotation.concurrent.Immutable;
 
 /**
  * An enumeration of the available {@link ImportedLabels} effects.
+ *
+ * @since 2.1.0
  */
 @Immutable
 public enum ImportedEffect {

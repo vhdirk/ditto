@@ -68,7 +68,9 @@ public interface Cache<K, V> {
      *
      * @param invalidationListener the {@link CacheInvalidationListener} to invoke when cache entries are invalided.
      */
-    default void subscribeForInvalidation(CacheInvalidationListener<K, V> invalidationListener) {}
+    default void subscribeForInvalidation(CacheInvalidationListener<K, V> invalidationListener) {
+
+    }
 
     /**
      * Associates the {@code value} with the {@code key} in this cache.

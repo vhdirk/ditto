@@ -31,6 +31,8 @@ import org.eclipse.ditto.model.policies.PolicyId;
 /**
  * Thrown if a {@link org.eclipse.ditto.model.policies.PolicyImport} was either not present or the requester had
  * insufficient permissions to access it.
+ *
+ * @since 2.1.0
  */
 @Immutable
 @JsonParsableException(errorCode = PolicyImportNotAccessibleException.ERROR_CODE)

@@ -20,8 +20,8 @@ import org.eclipse.ditto.model.base.entity.metadata.Metadata;
 import org.eclipse.ditto.model.base.headers.WithDittoHeaders;
 import org.eclipse.ditto.model.base.headers.entitytag.EntityTag;
 import org.eclipse.ditto.model.policies.Policy;
-import org.eclipse.ditto.model.policies.PolicyImport;
 import org.eclipse.ditto.model.policies.PolicyId;
+import org.eclipse.ditto.model.policies.PolicyImport;
 import org.eclipse.ditto.services.policies.common.config.PolicyConfig;
 import org.eclipse.ditto.services.utils.persistentactors.results.Result;
 import org.eclipse.ditto.services.utils.persistentactors.results.ResultFactory;
@@ -48,9 +48,10 @@ final class RetrievePolicyImportStrategy extends
 
         final PolicyId policyId = context.getState();
         if (policy != null) {
-            final Optional<PolicyImport> optionalImport = policy.getImports().flatMap(im -> im.getPolicyImport(command.getImportedPolicyId()));
+            final Optional<PolicyImport> optionalImport =
+                    policy.getImports().flatMap(im -> im.getPolicyImport(command.getImportedPolicyId()));
             if (optionalImport.isPresent()) {
-                final WithDittoHeaders response = appendETagHeaderIfProvided(command,
+                final WithDittoHeaders<?> response = appendETagHeaderIfProvided(command,
                         RetrievePolicyImportResponse.of(policyId, optionalImport.get(), command.getDittoHeaders()),
                         policy);
                 return ResultFactory.newQueryResult(command, response);
@@ -62,7 +63,7 @@ final class RetrievePolicyImportStrategy extends
 
     @Override
     public Optional<EntityTag> nextEntityTag(final RetrievePolicyImport command, @Nullable final Policy newEntity) {
-         return Optional.ofNullable(newEntity)
+        return Optional.ofNullable(newEntity)
                 .flatMap(p -> p.getImports())
                 .flatMap(im -> EntityTag.fromEntity(im.getPolicyImport(command.getImportedPolicyId()).orElse(null)));
     }

@@ -38,7 +38,7 @@ public final class TreeBasedPolicyEnforcerTest {
     public void tryToCreateInstanceWithNullPolicy() {
         assertThatExceptionOfType(NullPointerException.class)
                 .isThrownBy(() -> TreeBasedPolicyEnforcer.createInstance(null))
-                .withMessage("The %s must not be null!", "policy")
+                .withMessage("The %s must not be null!", "policyEntries")
                 .withNoCause();
     }
 

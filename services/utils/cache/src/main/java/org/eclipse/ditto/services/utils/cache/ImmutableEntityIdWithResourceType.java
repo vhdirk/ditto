@@ -79,7 +79,7 @@ final class ImmutableEntityIdWithResourceType implements EntityIdWithResourceTyp
      * @return the entity ID with resource type object.
      */
     static EntityIdWithResourceType of(final String resourceType, final EntityId id,
-            final CacheLookupContext cacheLookupContext) {
+            @Nullable final CacheLookupContext cacheLookupContext) {
         return new ImmutableEntityIdWithResourceType(resourceType, id, cacheLookupContext);
     }
 

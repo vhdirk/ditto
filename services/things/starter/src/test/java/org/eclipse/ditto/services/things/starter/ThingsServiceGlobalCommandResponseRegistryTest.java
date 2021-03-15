@@ -12,7 +12,6 @@
  */
 package org.eclipse.ditto.services.things.starter;
 
-import org.eclipse.ditto.services.models.policies.commands.sudo.SudoRetrievePolicyResponse;
 import org.eclipse.ditto.services.models.things.commands.sudo.SudoRetrieveThingResponse;
 import org.eclipse.ditto.services.utils.health.RetrieveHealthResponse;
 import org.eclipse.ditto.services.utils.test.GlobalCommandResponseRegistryTestCases;
@@ -48,8 +47,7 @@ public final class ThingsServiceGlobalCommandResponseRegistryTest extends Global
                 CleanupPersistenceResponse.class,
                 RetrieveConfigResponse.class,
                 RetrieveHealthResponse.class,
-                PurgeEntitiesResponse.class,
-                SudoRetrievePolicyResponse.class
+                PurgeEntitiesResponse.class
         );
     }
 

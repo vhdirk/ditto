@@ -12,6 +12,8 @@
  */
 package org.eclipse.ditto.signals.commands.policies.modify;
 
+import static org.eclipse.ditto.model.base.common.ConditionChecker.checkNotNull;
+
 import java.util.Objects;
 import java.util.function.Predicate;
 
@@ -34,6 +36,8 @@ import org.eclipse.ditto.signals.commands.base.CommandJsonDeserializer;
 
 /**
  * This command deletes a {@link org.eclipse.ditto.model.policies.PolicyImport}.
+ *
+ * @since 2.1.0
  */
 @Immutable
 @JsonParsableCommand(typePrefix = DeletePolicyImport.TYPE_PREFIX, name = DeletePolicyImport.NAME)
@@ -56,7 +60,8 @@ public final class DeletePolicyImport extends AbstractCommand<DeletePolicyImport
     private final PolicyId policyId;
     private final PolicyId importedPolicyId;
 
-    private DeletePolicyImport(final PolicyId policyId, final PolicyId importedPolicyId, final DittoHeaders dittoHeaders) {
+    private DeletePolicyImport(final PolicyId policyId, final PolicyId importedPolicyId,
+            final DittoHeaders dittoHeaders) {
         super(TYPE, dittoHeaders);
         this.policyId = policyId;
         this.importedPolicyId = importedPolicyId;
@@ -73,8 +78,8 @@ public final class DeletePolicyImport extends AbstractCommand<DeletePolicyImport
      */
     public static DeletePolicyImport of(final PolicyId policyId, final PolicyId importedPolicyId,
             final DittoHeaders dittoHeaders) {
-        Objects.requireNonNull(policyId, "The Policy identifier must not be null!");
-        Objects.requireNonNull(importedPolicyId, "The imported Policy ID must not be null!");
+        checkNotNull(policyId, "policyId");
+        checkNotNull(importedPolicyId, "importedPolicyId");
         return new DeletePolicyImport(policyId, importedPolicyId, dittoHeaders);
     }
 
@@ -105,7 +110,8 @@ public final class DeletePolicyImport extends AbstractCommand<DeletePolicyImport
      */
     public static DeletePolicyImport fromJson(final JsonObject jsonObject, final DittoHeaders dittoHeaders) {
         return new CommandJsonDeserializer<DeletePolicyImport>(TYPE, jsonObject).deserialize(() -> {
-            final PolicyId policyId = PolicyId.of(jsonObject.getValueOrThrow(PolicyModifyCommand.JsonFields.JSON_POLICY_ID));
+            final PolicyId policyId =
+                    PolicyId.of(jsonObject.getValueOrThrow(PolicyModifyCommand.JsonFields.JSON_POLICY_ID));
             final PolicyId theImportedPolicyId = PolicyId.of(jsonObject.getValueOrThrow(JSON_IMPORTED_POLICY_ID));
 
             return of(policyId, theImportedPolicyId, dittoHeaders);
@@ -166,8 +172,9 @@ public final class DeletePolicyImport extends AbstractCommand<DeletePolicyImport
             return false;
         }
         final DeletePolicyImport that = (DeletePolicyImport) obj;
-        return that.canEqual(this) && Objects.equals(policyId, that.policyId) && Objects.equals(
-                importedPolicyId, that.importedPolicyId)
+        return that.canEqual(this) &&
+                Objects.equals(policyId, that.policyId) &&
+                Objects.equals(importedPolicyId, that.importedPolicyId)
                 && super.equals(obj);
     }
 
@@ -179,8 +186,9 @@ public final class DeletePolicyImport extends AbstractCommand<DeletePolicyImport
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + " [" + super.toString() + ", policyId=" + policyId + ", importedPolicyId=" +
-                importedPolicyId +
+        return getClass().getSimpleName() + " [" + super.toString() +
+                ", policyId=" + policyId +
+                ", importedPolicyId=" + importedPolicyId +
                 "]";
     }
 

@@ -14,6 +14,8 @@ package org.eclipse.ditto.services.utils.cache;
 
 import java.util.Optional;
 
+import javax.annotation.Nullable;
+
 import org.eclipse.ditto.model.base.entity.id.EntityId;
 
 /**
@@ -69,7 +71,7 @@ public interface EntityIdWithResourceType {
      * @return the entity ID with resource type object.
      */
     static EntityIdWithResourceType of(final String resourceType, final EntityId id,
-            final CacheLookupContext cacheLookupContext) {
+            @Nullable final CacheLookupContext cacheLookupContext) {
         return CacheFactory.newEntityId(resourceType, id, cacheLookupContext);
     }
 

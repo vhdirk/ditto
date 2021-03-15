@@ -67,6 +67,9 @@ public abstract class AbstractDittoRootActorTest {
                 // bind random ports
                 "akka.management.http.port", 0,
                 "akka.remote.artery.canonical.port", 0,
+                "akka.loggers", List.of("akka.event.slf4j.Slf4jLogger"),
+                "akka.loglevel", "DEBUG",
+                "akka.logging-filter", "akka.event.DefaultLoggingFilter",
                 "akka.cluster.seed-nodes", List.of(),
                 "ditto.http.port", 0,
                 "ditto.metrics.prometheus.port", 0,

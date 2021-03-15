@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Contributors to the Eclipse Foundation
+ * Copyright (c) 2017 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -58,7 +58,7 @@ public final class PoliciesModelFactory {
      * @return a new Label with {@code labelValue} as its value.
      * @throws NullPointerException if {@code labelValue} is {@code null}.
      * @throws IllegalArgumentException if {@code labelValue} is empty.
-     * @throws LabelInvalidException of the {@code labelValue} can not be used to to blacklisted prefixes.
+     * @throws LabelInvalidException if the {@code labelValue} can not be used to to blacklisted prefixes.
      */
     public static Label newLabel(final CharSequence labelValue) {
         if (labelValue instanceof Label) {
@@ -745,6 +745,7 @@ public final class PoliciesModelFactory {
      * Returns a new {@link EffectedPermissions} containing the
      *
      * @return the new {@code EffectedPermissions}.
+     * @since 2.1.0
      */
     public static EffectedImports newEffectedImportedEntries(@Nullable final Iterable<String> includedImportedEntries,
             @Nullable final Iterable<String> excludedImportedEntries) {
@@ -759,6 +760,7 @@ public final class PoliciesModelFactory {
      * @param entryLabels the entryLabels to initialise the result with.
      * @return the new {@code ImportedLabels}.
      * @throws NullPointerException if {@code entryLabels} is {@code null};
+     * @since 2.1.0
      */
     public static ImportedLabels newImportedEntries(final Collection<String> entryLabels) {
         return ImmutableImportedLabels.of(entryLabels);
@@ -771,6 +773,7 @@ public final class PoliciesModelFactory {
      * @param furtherEntryLabels additional entryLabels to be contained in the result.
      * @return the new {@code ImportedLabels}.
      * @throws NullPointerException if any argument is {@code null}.
+     * @since 2.1.0
      */
     public static ImportedLabels newImportedEntries(final CharSequence entryLabel, final CharSequence... furtherEntryLabels) {
         return ImmutableImportedLabels.of(entryLabel, furtherEntryLabels);
@@ -778,7 +781,9 @@ public final class PoliciesModelFactory {
 
     /**
      * Returns a new immutable instance of {@link ImportedLabels} containing no labels.
+     *
      * @return the new {@code ImportedLabels}.
+     * @since 2.1.0
      */
     public static ImportedLabels noImportedEntries() {
         return ImmutableImportedLabels.none();
@@ -788,9 +793,10 @@ public final class PoliciesModelFactory {
      * Returns a new {@link PolicyImport} with the specified {@code importedPolicyId} and {@code effectedImportedEntries}.
      *
      * @param importedPolicyId The {@link PolicyId} of the imported policy
-     * @param isProtected
+     * @param isProtected whether this import is a protected one meaning that it may only be written once.
      * @return the new {@link PolicyImport}.
      * @throws NullPointerException if any argument is {@code null}.
+     * @since 2.1.0
      */
     public static PolicyImport newPolicyImport(final PolicyId importedPolicyId, final boolean isProtected) {
         return ImmutablePolicyImport.of(importedPolicyId, isProtected);
@@ -799,11 +805,13 @@ public final class PoliciesModelFactory {
     /**
      * Returns a new {@link PolicyImport} with the specified {@code importedPolicyId} and {@code effectedImports}.
      *
-     * @param importedPolicyId The {@link PolicyId} of the imported policy
-     * @param isProtected
-     * @param effectedImports
+     * @param importedPolicyId the {@link PolicyId} of the imported policy.
+     * @param isProtected whether this import is a protected one meaning that it may only be written once.
+     * @param effectedImports lists every {@code PolicyEntry} from the imported {@code Policy} that will be either
+     * included or excluded.
      * @return the new {@link PolicyImport}.
      * @throws NullPointerException if any argument is {@code null}.
+     * @since 2.1.0
      */
     public static PolicyImport newPolicyImport(final PolicyId importedPolicyId, final boolean isProtected,
             final EffectedImports effectedImports) {
@@ -818,6 +826,7 @@ public final class PoliciesModelFactory {
      * @return the new Policy import.
      * @throws NullPointerException if {@code jsonObject} is {@code null}.
      * @throws org.eclipse.ditto.model.base.exceptions.DittoJsonException if {@code jsonObject} cannot be parsed.
+     * @since 2.1.0
      */
     public static PolicyImport newPolicyImport(final PolicyId importedPolicyId, final JsonObject jsonObject) {
         return ImmutablePolicyImport.fromJson(importedPolicyId, jsonObject);
@@ -828,6 +837,7 @@ public final class PoliciesModelFactory {
      * Returns a new empty {@link PolicyImports}.
      *
      * @return the new {@code PolicyImports}.
+     * @since 2.1.0
      */
     public static PolicyImports emptyPolicyImports() {
         return ImmutablePolicyImports.of(Collections.emptyList());
@@ -839,6 +849,7 @@ public final class PoliciesModelFactory {
      * @param policyImports the PolicyImport iterator to use
      * @return the new {@code PolicyImports}.
      * @throws NullPointerException if {@code policyImports} is {@code null}.
+     * @since 2.1.0
      */
     public static PolicyImports newPolicyImports(final Iterable<PolicyImport> policyImports) {
         if (policyImports instanceof PolicyImports) {
@@ -854,11 +865,12 @@ public final class PoliciesModelFactory {
      * @param furtherPolicyImports further {@link Resource}s to be contained in the new Resources.
      * @return the new {@code Resources}.
      * @throws NullPointerException if any argument is {@code null}.
+     * @since 2.1.0
      */
     public static PolicyImports newPolicyImports(final PolicyImport policyImport,
             final PolicyImport... furtherPolicyImports) {
-        checkNotNull(policyImport, "mandatory policyImport");
-        checkNotNull(furtherPolicyImports, "additional policyImports");
+        checkNotNull(policyImport, "policyImport");
+        checkNotNull(furtherPolicyImports, "furtherPolicyImports");
 
         final Collection<PolicyImport> allPolicyImports =
                 new ArrayList<>(1 + furtherPolicyImports.length);
@@ -875,6 +887,7 @@ public final class PoliciesModelFactory {
      * @return the new PolicyImports.
      * @throws NullPointerException if {@code jsonObject} is {@code null}.
      * @throws org.eclipse.ditto.model.base.exceptions.DittoJsonException if {@code jsonObject} cannot be parsed.
+     * @since 2.1.0
      */
     public static PolicyImports newPolicyImports(final JsonObject jsonObject) {
         return ImmutablePolicyImports.fromJson(jsonObject);

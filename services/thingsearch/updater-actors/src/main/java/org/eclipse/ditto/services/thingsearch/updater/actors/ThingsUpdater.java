@@ -77,7 +77,6 @@ final class ThingsUpdater extends AbstractActorWithTimers {
 
     private final DittoDiagnosticLoggingAdapter log = DittoLoggerFactory.getDiagnosticLoggingAdapter(this);
     private final ActorRef updaterShardRegion;
-    private final ActorRef policiesShardRegion;
     private final Cache<EntityIdWithResourceType, Entry<Policy>> policyCache;
     private final BlockNamespaceBehavior namespaceBlockingBehavior;
     private final RetrieveStatisticsDetailsResponseSupplier retrieveStatisticsDetailsResponseSupplier;
@@ -96,7 +95,6 @@ final class ThingsUpdater extends AbstractActorWithTimers {
         this.thingEventSub = thingEventSub;
 
         this.updaterShardRegion = updaterShardRegion;
-        this.policiesShardRegion = policiesShardRegion;
 
         namespaceBlockingBehavior = BlockNamespaceBehavior.of(blockedNamespaces);
 
@@ -127,6 +125,7 @@ final class ThingsUpdater extends AbstractActorWithTimers {
      *
      * @param thingEventSub Ditto distributed-sub access for thing events.
      * @param updaterShardRegion shard region of thing-updaters
+     * @param policiesShardRegion shard region of policies in order to look up policies in the policies cache.
      * @param updaterConfig configuration for updaters.
      * @param blockedNamespaces cache of namespaces to block.
      * @param pubSubMediator the pubsub mediator for subscription for UpdateThing commands, or null if

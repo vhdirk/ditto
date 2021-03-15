@@ -61,6 +61,7 @@ public final class PolicyCommandStrategies
 
         // Policy Import
         addStrategy(new ModifyPolicyImportStrategy(policyConfig));
+        addStrategy(new RetrievePolicyImportsStrategy(policyConfig));
         addStrategy(new RetrievePolicyImportStrategy(policyConfig));
         addStrategy(new DeletePolicyImportStrategy(policyConfig));
 

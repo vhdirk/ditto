@@ -37,9 +37,11 @@ import org.eclipse.ditto.signals.events.base.EventJsonDeserializer;
 
 /**
  * This event is emitted after a {@link org.eclipse.ditto.model.policies.PolicyImport} was deleted.
+ *
+ * @since 2.1.0
  */
 @Immutable
-@JsonParsableEvent(name = PolicyImportDeleted.NAME, typePrefix= PolicyImportDeleted.TYPE_PREFIX)
+@JsonParsableEvent(name = PolicyImportDeleted.NAME, typePrefix = PolicyImportDeleted.TYPE_PREFIX)
 public final class PolicyImportDeleted extends AbstractPolicyEvent<PolicyImportDeleted>
         implements PolicyEvent<PolicyImportDeleted> {
 
@@ -64,7 +66,7 @@ public final class PolicyImportDeleted extends AbstractPolicyEvent<PolicyImportD
             @Nullable final Instant timestamp,
             final DittoHeaders dittoHeaders) {
 
-        super(TYPE, checkNotNull(policyId, "Policy identifier"), revision, timestamp, dittoHeaders);
+        super(TYPE, checkNotNull(policyId, "policyId"), revision, timestamp, dittoHeaders);
         this.importedPolicyId = checkNotNull(importedPolicyId, "importedPolicyId");
     }
 
@@ -192,7 +194,9 @@ public final class PolicyImportDeleted extends AbstractPolicyEvent<PolicyImportD
             return false;
         }
         final PolicyImportDeleted that = (PolicyImportDeleted) o;
-        return that.canEqual(this) && Objects.equals(importedPolicyId, that.importedPolicyId) && super.equals(that);
+        return that.canEqual(this) &&
+                Objects.equals(importedPolicyId, that.importedPolicyId) &&
+                super.equals(that);
     }
 
     @Override
@@ -202,7 +206,9 @@ public final class PolicyImportDeleted extends AbstractPolicyEvent<PolicyImportD
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + " [" + super.toString() + ", importedPolicyId=" + importedPolicyId + "]";
+        return getClass().getSimpleName() + " [" + super.toString() +
+                ", importedPolicyId=" + importedPolicyId +
+                "]";
     }
 
 }

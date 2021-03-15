@@ -40,6 +40,8 @@ import org.eclipse.ditto.signals.commands.base.CommandResponseJsonDeserializer;
 
 /**
  * Response to a {@link RetrievePolicyImport} command.
+ *
+ * @since 2.1.0
  */
 @Immutable
 @JsonParsableCommandResponse(type = RetrievePolicyImportResponse.TYPE)
@@ -68,9 +70,9 @@ public final class RetrievePolicyImportResponse extends AbstractCommandResponse<
             final DittoHeaders dittoHeaders) {
 
         super(TYPE, statusCode, dittoHeaders);
-        this.policyId = checkNotNull(policyId, "Policy ID");
-        this.importedPolicyId = checkNotNull(importedPolicyId, "Imported Policy ID");
-        this.policyImport = checkNotNull(policyImport, "Policy import");
+        this.policyId = checkNotNull(policyId, "policyId");
+        this.importedPolicyId = checkNotNull(importedPolicyId, "importedPolicyId");
+        this.policyImport = checkNotNull(policyImport, "policyImport");
     }
 
     /**
@@ -86,7 +88,7 @@ public final class RetrievePolicyImportResponse extends AbstractCommandResponse<
             final DittoHeaders dittoHeaders) {
 
         return new RetrievePolicyImportResponse(policyId, HttpStatus.OK, policyImport.getImportedPolicyId(),
-                checkNotNull(policyImport, "Policy Import")
+                checkNotNull(policyImport, "policyImport")
                         .toJson(dittoHeaders.getSchemaVersion().orElse(policyImport.getLatestSchemaVersion())),
                 dittoHeaders);
     }
@@ -210,9 +212,11 @@ public final class RetrievePolicyImportResponse extends AbstractCommandResponse<
             return false;
         }
         final RetrievePolicyImportResponse that = (RetrievePolicyImportResponse) o;
-        return that.canEqual(this) && Objects.equals(policyId, that.policyId)
-                && Objects.equals(importedPolicyId, that.importedPolicyId)
-                && Objects.equals(policyImport, that.policyImport) && super.equals(o);
+        return that.canEqual(this) &&
+                Objects.equals(policyId, that.policyId) &&
+                Objects.equals(importedPolicyId, that.importedPolicyId) &&
+                Objects.equals(policyImport, that.policyImport) &&
+                super.equals(o);
     }
 
     @Override
@@ -222,8 +226,11 @@ public final class RetrievePolicyImportResponse extends AbstractCommandResponse<
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + " [" + super.toString() + ", policyId=" + policyId
-                + ", importedPolicyId=" + importedPolicyId + ", policyImport=" + policyImport + "]";
+        return getClass().getSimpleName() + " [" + super.toString() +
+                ", policyId=" + policyId +
+                ", importedPolicyId=" + importedPolicyId +
+                ", policyImport=" + policyImport +
+                "]";
     }
 
 }

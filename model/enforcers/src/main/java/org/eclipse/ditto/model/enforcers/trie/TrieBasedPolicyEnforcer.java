@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Contributors to the Eclipse Foundation
+ * Copyright (c) 2017 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -104,7 +104,7 @@ public final class TrieBasedPolicyEnforcer implements Enforcer {
      * @throws NullPointerException if {@code policy} is {@code null}.
      */
     public static TrieBasedPolicyEnforcer newInstance(final Iterable<PolicyEntry> policyEntries) {
-        return new TrieBasedPolicyEnforcer(checkNotNull(policyEntries, "policy to interpret"));
+        return new TrieBasedPolicyEnforcer(checkNotNull(policyEntries, "policyEntries"));
     }
 
     /**

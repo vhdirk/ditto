@@ -18,8 +18,8 @@ import java.time.Instant;
 
 import org.eclipse.ditto.model.base.headers.DittoHeaders;
 import org.eclipse.ditto.model.policies.Policy;
-import org.eclipse.ditto.model.policies.PolicyImport;
 import org.eclipse.ditto.model.policies.PolicyId;
+import org.eclipse.ditto.model.policies.PolicyImport;
 import org.eclipse.ditto.services.policies.persistence.TestConstants;
 import org.eclipse.ditto.signals.events.policies.PolicyImportCreated;
 
@@ -43,7 +43,8 @@ public class PolicyImportCreatedStrategyTest extends AbstractPolicyEventStrategy
 
     @Override
     protected void additionalAssertions(final Policy policyWithEventApplied) {
-        assertThat(policyWithEventApplied.getImports().flatMap(policyImports -> policyImports.getPolicyImport(CREATED.getImportedPolicyId())))
+        assertThat(policyWithEventApplied.getImports()
+                .flatMap(policyImports -> policyImports.getPolicyImport(CREATED.getImportedPolicyId())))
                 .contains(CREATED);
     }
 }

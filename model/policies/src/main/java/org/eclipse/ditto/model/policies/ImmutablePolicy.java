@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Contributors to the Eclipse Foundation
+ * Copyright (c) 2017 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -117,9 +117,9 @@ final class ImmutablePolicy implements Policy {
      * @param policyId the ID of the new Policy.
      * @param lifecycle the lifecycle of the Policy to be created.
      * @param revision the revision of the Policy to be created.
-     * @param imports the PolicyImports of the Policy to be created.
      * @param modified the modified timestamp of the Policy to be created.
      * @param created the created timestamp of the Policy to be created.
+     * @param imports the PolicyImports of the Policy to be created.
      * @param entries the entries of the Policy to be created.
      * @return a new initialised Policy.
      * @throws NullPointerException if {@code entries} is {@code null}.
@@ -545,13 +545,13 @@ final class ImmutablePolicy implements Policy {
                 Objects.equals(revision, that.revision) &&
                 Objects.equals(modified, that.modified) &&
                 Objects.equals(created, that.created) &&
-                Objects.equals(entries, that.entries) &&
-                Objects.equals(imports, that.imports);
+                Objects.equals(imports, that.imports) &&
+                Objects.equals(entries, that.entries);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(policyId, namespace, lifecycle, revision, modified, created, entries, imports);
+        return Objects.hash(policyId, namespace, lifecycle, revision, modified, created, imports, entries);
     }
 
     @Override
@@ -563,8 +563,8 @@ final class ImmutablePolicy implements Policy {
                 ", revision=" + revision +
                 ", modified=" + modified +
                 ", created=" + created +
-                ", entries=" + entries +
                 ", imports=" + imports +
+                ", entries=" + entries +
                 "]";
     }
 

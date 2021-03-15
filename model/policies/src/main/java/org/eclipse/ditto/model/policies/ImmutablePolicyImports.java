@@ -47,9 +47,9 @@ final class ImmutablePolicyImports implements PolicyImports {
 
     private final Map<CharSequence, PolicyImport> policyImports;
 
-    private ImmutablePolicyImports(final Map<CharSequence, PolicyImport> thePolicyImports) {
-        checkNotNull(thePolicyImports, "policyImports");
-        policyImports = Collections.unmodifiableMap(new HashMap<>(thePolicyImports));
+    private ImmutablePolicyImports(final Map<CharSequence, PolicyImport> policyImports) {
+        checkNotNull(policyImports, "policyImports");
+        this.policyImports = Collections.unmodifiableMap(new HashMap<>(policyImports));
     }
 
     /**
@@ -96,13 +96,13 @@ final class ImmutablePolicyImports implements PolicyImports {
 
     @Override
     public Optional<PolicyImport> getPolicyImport(final CharSequence importedPolicyId) {
-        checkNotNull(importedPolicyId, "Imported Policy ID of the PolicyImport to retrieve");
+        checkNotNull(importedPolicyId, "importedPolicyId");
         return Optional.ofNullable(policyImports.get(importedPolicyId));
     }
 
     @Override
     public PolicyImports setPolicyImport(final PolicyImport policyImport) {
-        checkNotNull(policyImport, "policy import to set");
+        checkNotNull(policyImport, "policyImport");
 
         PolicyImports result = this;
 
@@ -116,7 +116,7 @@ final class ImmutablePolicyImports implements PolicyImports {
 
     @Override
     public PolicyImports setPolicyImports(final PolicyImports policyImports) {
-        checkNotNull(policyImports, "policy imports to set");
+        checkNotNull(policyImports, "policyImports");
 
         PolicyImports result = this;
         for (PolicyImport policyImport : policyImports) {
@@ -138,7 +138,7 @@ final class ImmutablePolicyImports implements PolicyImports {
 
     @Override
     public PolicyImports removePolicyImport(final CharSequence importedPolicyId) {
-        checkNotNull(importedPolicyId, "Imported Policy ID of the ImportedPolicy to remove");
+        checkNotNull(importedPolicyId, "importedPolicyId");
 
         if (!policyImports.containsKey(importedPolicyId)) {
             return this;

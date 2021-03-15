@@ -31,7 +31,7 @@ import nl.jqno.equalsverifier.EqualsVerifier;
 /**
  * Unit test for {@link ModifyPolicyImportsResponse}.
  */
-public class ModifyPolicyImportsResponseTest {
+public final class ModifyPolicyImportsResponseTest {
 
     private static final JsonObject KNOWN_JSON = JsonFactory.newObjectBuilder()
             .set(PolicyCommandResponse.JsonFields.TYPE, ModifyPolicyImportsResponse.TYPE)

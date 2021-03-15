@@ -34,12 +34,14 @@ import org.eclipse.ditto.model.base.json.FieldType;
 import org.eclipse.ditto.model.base.json.JsonParsableEvent;
 import org.eclipse.ditto.model.base.json.JsonSchemaVersion;
 import org.eclipse.ditto.model.policies.PoliciesModelFactory;
-import org.eclipse.ditto.model.policies.PolicyImport;
 import org.eclipse.ditto.model.policies.PolicyId;
+import org.eclipse.ditto.model.policies.PolicyImport;
 import org.eclipse.ditto.signals.events.base.EventJsonDeserializer;
 
 /**
  * This event is emitted after a {@link PolicyImport} was created.
+ *
+ * @since 2.1.0
  */
 @Immutable
 @JsonParsableEvent(name = PolicyImportCreated.NAME, typePrefix= PolicyImportCreated.TYPE_PREFIX)
@@ -70,8 +72,8 @@ public final class PolicyImportCreated extends AbstractPolicyEvent<PolicyImportC
             @Nullable final Instant timestamp,
             final DittoHeaders dittoHeaders) {
 
-        super(TYPE, checkNotNull(policyId, "Policy identifier"), revision, timestamp, dittoHeaders);
-        this.policyImport = checkNotNull(policyImport, "Policy Import");
+        super(TYPE, checkNotNull(policyId, "policyId"), revision, timestamp, dittoHeaders);
+        this.policyImport = checkNotNull(policyImport, "policyImport");
     }
 
     /**
@@ -207,7 +209,9 @@ public final class PolicyImportCreated extends AbstractPolicyEvent<PolicyImportC
             return false;
         }
         final PolicyImportCreated that = (PolicyImportCreated) o;
-        return that.canEqual(this) && Objects.equals(policyImport, that.policyImport) && super.equals(that);
+        return that.canEqual(this) &&
+                Objects.equals(policyImport, that.policyImport) &&
+                super.equals(that);
     }
 
     @Override
@@ -217,7 +221,9 @@ public final class PolicyImportCreated extends AbstractPolicyEvent<PolicyImportC
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + " [" + super.toString() + ", policyImport=" + policyImport + "]";
+        return getClass().getSimpleName() + " [" + super.toString() +
+                ", policyImport=" + policyImport +
+                "]";
     }
 
 }

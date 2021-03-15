@@ -37,6 +37,8 @@ import org.eclipse.ditto.signals.commands.base.CommandResponseJsonDeserializer;
 
 /**
  * Response to a {@link DeletePolicyImport} command.
+ *
+ * @since 2.1.0
  */
 @Immutable
 @JsonParsableCommandResponse(type = DeletePolicyImportResponse.TYPE)
@@ -58,8 +60,8 @@ public final class DeletePolicyImportResponse extends AbstractCommandResponse<De
             final HttpStatus statusCode, final DittoHeaders dittoHeaders) {
 
         super(TYPE, statusCode, dittoHeaders);
-        this.policyId = checkNotNull(policyId, "Policy ID");
-        this.importedPolicyId = checkNotNull(importedPolicyId, "Imported Policy ID");
+        this.policyId = checkNotNull(policyId, "policyId");
+        this.importedPolicyId = checkNotNull(importedPolicyId, "importedPolicyId");
     }
 
     /**
@@ -172,8 +174,9 @@ public final class DeletePolicyImportResponse extends AbstractCommandResponse<De
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + " [" + super.toString() + ", policyId=" + policyId + ", importedPolicyId=" +
-                importedPolicyId +
+        return getClass().getSimpleName() + " [" + super.toString() +
+                ", policyId=" + policyId +
+                ", importedPolicyId=" + importedPolicyId +
                 "]";
     }
 

@@ -41,7 +41,7 @@ final class ImmutableImportedLabels extends AbstractSet<String> implements Impor
     private final Set<String> entryLabels;
 
     private ImmutableImportedLabels(final Set<String> entryLabels) {
-        checkNotNull(entryLabels, "entry labels");
+        checkNotNull(entryLabels, "entryLabels");
         this.entryLabels = Collections.unmodifiableSet(new HashSet<>(entryLabels));
     }
 
@@ -65,7 +65,7 @@ final class ImmutableImportedLabels extends AbstractSet<String> implements Impor
      */
     public static ImportedLabels of(final CharSequence entryLabel, final CharSequence... furtherEntryLabels) {
         checkNotNull(entryLabel, "entryLabel");
-        checkNotNull(furtherEntryLabels, "further entryLabels");
+        checkNotNull(furtherEntryLabels, "furtherEntryLabels");
 
         final HashSet<String> entryLabels = new HashSet<>(1 + furtherEntryLabels.length);
         entryLabels.add(entryLabel.toString());
@@ -96,8 +96,8 @@ final class ImmutableImportedLabels extends AbstractSet<String> implements Impor
 
     @Override
     public boolean contains(final CharSequence label, final CharSequence... furtherLabels) {
-        checkNotNull(label, "label whose presence is to be checked");
-        checkNotNull(furtherLabels, "further labels whose presence are to be checked");
+        checkNotNull(label, "label");
+        checkNotNull(furtherLabels, "furtherLabels");
 
         final HashSet<String> entryLabelSet = new HashSet<>();
         entryLabelSet.add(label.toString());
@@ -107,10 +107,10 @@ final class ImmutableImportedLabels extends AbstractSet<String> implements Impor
     }
 
     @Override
-    public boolean contains(final ImportedLabels label) {
-        checkNotNull(label, "labels whose presence is to be checked");
+    public boolean contains(final ImportedLabels importedLabels) {
+        checkNotNull(importedLabels, "importedLabels");
 
-        return this.entryLabels.containsAll(label);
+        return this.entryLabels.containsAll(importedLabels);
     }
 
     @Override

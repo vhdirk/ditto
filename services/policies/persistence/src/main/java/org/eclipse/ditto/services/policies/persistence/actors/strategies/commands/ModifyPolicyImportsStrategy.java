@@ -33,8 +33,8 @@ import org.eclipse.ditto.services.utils.persistentactors.results.ResultFactory;
 import org.eclipse.ditto.signals.commands.policies.PolicyCommandSizeValidator;
 import org.eclipse.ditto.signals.commands.policies.modify.ModifyPolicyImports;
 import org.eclipse.ditto.signals.commands.policies.modify.ModifyPolicyImportsResponse;
-import org.eclipse.ditto.signals.events.policies.PolicyImportsModified;
 import org.eclipse.ditto.signals.events.policies.PolicyEvent;
+import org.eclipse.ditto.signals.events.policies.PolicyImportsModified;
 
 /**
  * This strategy handles the {@link org.eclipse.ditto.signals.commands.policies.modify.ModifyPolicyImports} command.

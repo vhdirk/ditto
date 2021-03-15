@@ -42,9 +42,9 @@ final class ImmutablePolicyImport implements PolicyImport {
 
     private ImmutablePolicyImport(final PolicyId importedPolicyId, final boolean isProtected,
             final EffectedImports effectedPermissions) {
-        this.importedPolicyId = checkNotNull(importedPolicyId, "imported policy id");
+        this.importedPolicyId = checkNotNull(importedPolicyId, "importedPolicyId");
         this.isProtected = isProtected;
-        this.effectedImports = checkNotNull(effectedPermissions, "effected imported entries");
+        this.effectedImports = checkNotNull(effectedPermissions, "effectedPermissions");
     }
 
     /**
@@ -52,7 +52,7 @@ final class ImmutablePolicyImport implements PolicyImport {
      * {@code effectedImports}.
      *
      * @param importedPolicyId the {@code PolicyId} where entries will be imported from.
-     * @param isProtected
+     * @param isProtected whether this import is a protected one meaning that it may only be written once.
      * @return a new {@code PolicyImport} object.
      * @throws NullPointerException if any argument is {@code null}.
      */
@@ -65,8 +65,9 @@ final class ImmutablePolicyImport implements PolicyImport {
      * Creates a new {@code PolicyImport} object based on the given {@code importedPolicyId} and {@code effectedImports}.
      *
      * @param importedPolicyId the {@code PolicyId} where entries will be imported from.
-     * @param isProtected
-     * @param effectedImports lists every {@code PolicyEntry} from the imported {@code Policy} that will be either included or excluded
+     * @param isProtected whether this import is a protected one meaning that it may only be written once.
+     * @param effectedImports lists every {@code PolicyEntry} from the imported {@code Policy} that will be either
+     * included or excluded.
      * @return a new {@code PolicyImport} object.
      * @throws NullPointerException if any argument is {@code null}.
      */
@@ -78,7 +79,7 @@ final class ImmutablePolicyImport implements PolicyImport {
     /**
      * Creates a new {@code PolicyImport} object based on the given {@code importedPolicyId} and {@code jsonValue}.
      *
-     * @param importedPolicyId  the {@code PolicyId} where entries will be imported from.
+     * @param importedPolicyId the {@code PolicyId} where entries will be imported from.
      * @param jsonValue the JSON value containing the effected permissions for the PolicyImport. This value is supposed to
      * be a {@link JsonObject}.
      * @return a new {@code PolicyImport} object.
@@ -86,7 +87,7 @@ final class ImmutablePolicyImport implements PolicyImport {
      * @throws DittoJsonException if {@code jsonValue} is not a JSON object or the JSON has not the expected format.
      */
     public static PolicyImport fromJson(final PolicyId importedPolicyId, final JsonValue jsonValue) {
-        checkNotNull(jsonValue, "JSON value");
+        checkNotNull(jsonValue, "jsonValue");
 
         final Optional<JsonObject> jsonFields = Optional.of(jsonValue)
                 .filter(JsonValue::isObject)

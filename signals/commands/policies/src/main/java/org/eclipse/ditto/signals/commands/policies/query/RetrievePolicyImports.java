@@ -32,6 +32,8 @@ import org.eclipse.ditto.signals.commands.base.CommandJsonDeserializer;
 
 /**
  * Command which retrieves the Policy imports of a {@code Policy} based on the passed in Policy ID.
+ *
+ * @since 2.1.0
  */
 @Immutable
 @JsonParsableCommand(typePrefix = RetrievePolicyImports.TYPE_PREFIX, name = RetrievePolicyImports.NAME)
@@ -137,7 +139,9 @@ public final class RetrievePolicyImports extends AbstractCommand<RetrievePolicyI
             return false;
         }
         final RetrievePolicyImports that = (RetrievePolicyImports) obj;
-        return that.canEqual(this) && Objects.equals(policyId, that.policyId) && super.equals(that);
+        return that.canEqual(this) &&
+                Objects.equals(policyId, that.policyId) &&
+                super.equals(that);
     }
 
     @Override
@@ -153,7 +157,9 @@ public final class RetrievePolicyImports extends AbstractCommand<RetrievePolicyI
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + " [" + super.toString() + ", policyId=" + policyId + "]";
+        return getClass().getSimpleName() + " [" + super.toString() +
+                ", policyId=" + policyId +
+                "]";
     }
 
 }

@@ -47,8 +47,8 @@ final class RetrievePolicyImportsStrategy extends
 
         final PolicyId policyId = context.getState();
         if (policy != null) {
-            final WithDittoHeaders response = appendETagHeaderIfProvided(command,
-                    RetrievePolicyImportsResponse.of(policyId, policy.getImports(), command.getDittoHeaders()),
+            final WithDittoHeaders<?> response = appendETagHeaderIfProvided(command,
+                    RetrievePolicyImportsResponse.of(policyId, policy.getImports().orElse(null), command.getDittoHeaders()),
                     policy);
             return ResultFactory.newQueryResult(command, response);
         } else {

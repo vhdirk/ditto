@@ -40,6 +40,8 @@ import org.eclipse.ditto.signals.commands.base.CommandResponseJsonDeserializer;
 
 /**
  * Response to a {@link ModifyPolicyImports} command.
+ *
+ * @since 2.1.0
  */
 @Immutable
 @JsonParsableCommandResponse(type = ModifyPolicyImportsResponse.TYPE)
@@ -61,7 +63,7 @@ public final class ModifyPolicyImportsResponse extends AbstractCommandResponse<M
             @Nullable final PolicyImports policyImportsCreated, final DittoHeaders dittoHeaders) {
 
         super(TYPE, statusCode, dittoHeaders);
-        this.policyId = checkNotNull(policyId, "Policy ID");
+        this.policyId = checkNotNull(policyId, "policyId");
         this.policyImportsCreated = policyImportsCreated;
     }
 
@@ -179,8 +181,10 @@ public final class ModifyPolicyImportsResponse extends AbstractCommandResponse<M
             return false;
         }
         final ModifyPolicyImportsResponse that = (ModifyPolicyImportsResponse) o;
-        return that.canEqual(this) && Objects.equals(policyId, that.policyId)
-                && Objects.equals(policyImportsCreated, that.policyImportsCreated) && super.equals(o);
+        return that.canEqual(this) &&
+                Objects.equals(policyId, that.policyId) &&
+                Objects.equals(policyImportsCreated, that.policyImportsCreated) &&
+                super.equals(o);
     }
 
     @Override
@@ -195,8 +199,10 @@ public final class ModifyPolicyImportsResponse extends AbstractCommandResponse<M
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + " [" + super.toString() + ", policyId=" + policyId +
-                ", policyImportsCreated=" + policyImportsCreated + "]";
+        return getClass().getSimpleName() + " [" + super.toString() +
+                ", policyId=" + policyId +
+                ", policyImportsCreated=" + policyImportsCreated +
+                "]";
     }
 
 }

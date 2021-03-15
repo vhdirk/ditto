@@ -26,14 +26,16 @@ import org.eclipse.ditto.model.base.json.Jsonifiable;
 /**
  * Represents a single import of another {@link Policy} based on its {@code policyId} and {@link EffectedImports}
  * containing optional includes and excludes.
+ *
+ * @since 2.1.0
  */
 public interface PolicyImport extends Jsonifiable.WithFieldSelectorAndPredicate<JsonField> {
 
     /**
      * Returns a new {@code PolicyImport} with the specified {@code resourceKey} and {@code effectedPermissions}.
      *
-     * @param importedPolicyId TODO TJ doc
-     * @param isProtected
+     * @param importedPolicyId the {@link PolicyId} of the imported policy.
+     * @param isProtected whether this import is a protected one meaning that it may only be written once.
      * @param effectedImports the EffectedImports of the new PolicyImport to create.
      * @return the new {@code PolicyImport}.
      * @throws NullPointerException if any argument is {@code null}.

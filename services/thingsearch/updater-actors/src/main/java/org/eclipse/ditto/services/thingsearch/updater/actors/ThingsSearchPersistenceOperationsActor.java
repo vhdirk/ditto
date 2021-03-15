@@ -31,6 +31,7 @@ public final class ThingsSearchPersistenceOperationsActor extends AbstractPersis
      */
     public static final String ACTOR_NAME = "thingsSearchOpsActor";
 
+    @SuppressWarnings("unnused") // called via props()
     private ThingsSearchPersistenceOperationsActor(final ActorRef pubSubMediator,
             final NamespacePersistenceOperations namespaceOps,
             final PersistenceOperationsConfig persistenceOperationsConfig) {
@@ -53,9 +54,8 @@ public final class ThingsSearchPersistenceOperationsActor extends AbstractPersis
     public static Props props(final ActorRef pubSubMediator, final ThingsSearchUpdaterPersistence persistence,
             final PersistenceOperationsConfig persistenceOperationsConfig) {
 
-        return Props.create(ThingsSearchPersistenceOperationsActor.class,
-                () -> new ThingsSearchPersistenceOperationsActor(pubSubMediator, persistence,
-                        persistenceOperationsConfig));
+        return Props.create(ThingsSearchPersistenceOperationsActor.class, pubSubMediator, persistence,
+                        persistenceOperationsConfig);
     }
 
 }

@@ -56,7 +56,7 @@ public final class ModifyPolicyImportsStrategyTest extends AbstractPolicyCommand
 
         final PolicyImports policyImports = TestConstants.Policy.POLICY_IMPORTS;
         final ModifyPolicyImports command = ModifyPolicyImports.of(TestConstants.Policy.POLICY_ID,
-                        policyImports, dittoHeaders);
+                policyImports, dittoHeaders);
 
         assertModificationResult(underTest, policy, command,
                 PolicyImportsModified.class,

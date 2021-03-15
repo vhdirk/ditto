@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Contributors to the Eclipse Foundation
+ * Copyright (c) 2017 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -532,6 +532,7 @@ public interface PolicyBuilder {
      *
      * @param imports the PolicyImports to be set.
      * @return this builder to allow method chaining.
+     * @since 2.1.0
      */
     PolicyBuilder setImports(@Nullable PolicyImports imports);
 

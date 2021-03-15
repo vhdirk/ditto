@@ -20,6 +20,8 @@ import org.eclipse.ditto.model.base.json.Jsonifiable;
 
 /**
  * This Set contains the imported Policy {@link Label}s.
+ *
+ * @since 2.1.0
  */
 public interface ImportedLabels extends Set<String>, Jsonifiable<JsonArray> {
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Contributors to the Eclipse Foundation
+ * Copyright (c) 2017 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -76,7 +76,7 @@ public final class TreeBasedPolicyEnforcer implements Enforcer {
      * @throws NullPointerException if {@code policy} is {@code null}.
      */
     public static TreeBasedPolicyEnforcer createInstance(final Iterable<PolicyEntry> policyEntries) {
-        checkNotNull(policyEntries, "policy");
+        checkNotNull(policyEntries, "policyEntries");
         final Map<String, PolicyTreeNode> tree = new HashMap<>();
 
         policyEntries.forEach(policyEntry -> {

@@ -25,17 +25,17 @@ import org.eclipse.ditto.services.utils.config.ScopedConfig;
 import com.typesafe.config.Config;
 
 /**
- * This class implements {@link CachesConfig} for Ditto's Concierge service.
+ * Default implementation for {@link CachesConfig}.
  */
 @Immutable
-public final class UpdaterCachesConfig implements CachesConfig {
+public final class DefaultCachesConfig implements CachesConfig {
 
     private static final String CONFIG_PATH = "caches";
 
     private final Duration askTimeout;
     private final CacheConfig policyCacheConfig;
 
-    private UpdaterCachesConfig(final ScopedConfig config) {
+    private DefaultCachesConfig(final ScopedConfig config) {
         askTimeout = config.getDuration(CachesConfigValue.ASK_TIMEOUT.getConfigPath());
         policyCacheConfig = DefaultCacheConfig.of(config, "policy");
     }
@@ -47,8 +47,8 @@ public final class UpdaterCachesConfig implements CachesConfig {
      * @return the instance.
      * @throws org.eclipse.ditto.services.utils.config.DittoConfigError if {@code config} is invalid.
      */
-    public static UpdaterCachesConfig of(final Config config) {
-        return new UpdaterCachesConfig(ConfigWithFallback.newInstance(config, CONFIG_PATH, CachesConfigValue.values()));
+    public static DefaultCachesConfig of(final Config config) {
+        return new DefaultCachesConfig(ConfigWithFallback.newInstance(config, CONFIG_PATH, CachesConfigValue.values()));
     }
 
     @Override
@@ -69,7 +69,7 @@ public final class UpdaterCachesConfig implements CachesConfig {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        final UpdaterCachesConfig that = (UpdaterCachesConfig) o;
+        final DefaultCachesConfig that = (DefaultCachesConfig) o;
         return askTimeout.equals(that.askTimeout) &&
                 policyCacheConfig.equals(that.policyCacheConfig);
     }

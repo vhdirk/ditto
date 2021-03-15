@@ -15,7 +15,6 @@ package org.eclipse.ditto.signals.commands.policies.query;
 import static org.eclipse.ditto.model.base.common.ConditionChecker.checkNotNull;
 
 import java.util.Objects;
-import java.util.Optional;
 import java.util.function.Predicate;
 
 import javax.annotation.Nullable;
@@ -41,6 +40,8 @@ import org.eclipse.ditto.signals.commands.base.CommandResponseJsonDeserializer;
 
 /**
  * Response to a {@link RetrievePolicyImports} command.
+ *
+ * @since 2.1.0
  */
 @Immutable
 @JsonParsableCommandResponse(type = RetrievePolicyImportsResponse.TYPE)
@@ -64,8 +65,8 @@ public final class RetrievePolicyImportsResponse extends AbstractCommandResponse
             final DittoHeaders dittoHeaders) {
 
         super(TYPE, statusCode, dittoHeaders);
-        this.policyId = checkNotNull(policyId, "Policy ID");
-        this.policyImports = checkNotNull(policyImports, "Policy imports");
+        this.policyId = checkNotNull(policyId, "policyId");
+        this.policyImports = checkNotNull(policyImports, "policyImports");
     }
 
     /**
@@ -77,13 +78,16 @@ public final class RetrievePolicyImportsResponse extends AbstractCommandResponse
      * @return the response.
      * @throws NullPointerException if any argument is {@code null}.
      */
-    public static RetrievePolicyImportsResponse of(final PolicyId policyId, final Optional<PolicyImports> policyImports,
+    public static RetrievePolicyImportsResponse of(final PolicyId policyId, @Nullable final PolicyImports policyImports,
             final DittoHeaders dittoHeaders) {
 
-        return new RetrievePolicyImportsResponse(policyId, HttpStatus.OK,
-                policyImports.map(imports ->
-                    imports.toJson(dittoHeaders.getSchemaVersion().orElse(JsonSchemaVersion.LATEST))).orElse(JsonFactory.newObject()),
-                dittoHeaders);
+        final JsonObject importsObject;
+        if (null != policyImports) {
+            importsObject = policyImports.toJson(dittoHeaders.getSchemaVersion().orElse(JsonSchemaVersion.LATEST));
+        } else {
+            importsObject = JsonFactory.newObject();
+        }
+        return new RetrievePolicyImportsResponse(policyId, HttpStatus.OK, importsObject, dittoHeaders);
     }
 
     /**
@@ -195,8 +199,10 @@ public final class RetrievePolicyImportsResponse extends AbstractCommandResponse
             return false;
         }
         final RetrievePolicyImportsResponse that = (RetrievePolicyImportsResponse) o;
-        return that.canEqual(this) && Objects.equals(policyId, that.policyId) &&
-                Objects.equals(policyImports, that.policyImports) && super.equals(o);
+        return that.canEqual(this) &&
+                Objects.equals(policyId, that.policyId) &&
+                Objects.equals(policyImports, that.policyImports) &&
+                super.equals(o);
     }
 
     @Override
@@ -206,8 +212,10 @@ public final class RetrievePolicyImportsResponse extends AbstractCommandResponse
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + " [" + super.toString() + ", policyId=" + policyId + ", policyImports=" +
-                policyImports + "]";
+        return getClass().getSimpleName() + " [" + super.toString() +
+                ", policyId=" + policyId +
+                ", policyImports=" + policyImports +
+                "]";
     }
 
 }

@@ -22,7 +22,10 @@ import org.eclipse.ditto.signals.events.policies.PolicyImportDeleted;
 final class PolicyImportDeletedStrategy extends AbstractPolicyEventStrategy<PolicyImportDeleted> {
 
     @Override
-    protected PolicyBuilder applyEvent(final PolicyImportDeleted pid, final Policy policy, final PolicyBuilder policyBuilder) {
-        return policyBuilder.setImports(policy.getImports().map(policyImports -> policyImports.removePolicyImport(pid.getImportedPolicyId())).orElse(null));
+    protected PolicyBuilder applyEvent(final PolicyImportDeleted pid, final Policy policy,
+            final PolicyBuilder policyBuilder) {
+        return policyBuilder.setImports(policy.getImports()
+                .map(policyImports -> policyImports.removePolicyImport(pid.getImportedPolicyId()))
+                .orElse(null));
     }
 }

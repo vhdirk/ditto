@@ -41,6 +41,8 @@ import org.eclipse.ditto.signals.commands.base.CommandResponseJsonDeserializer;
 
 /**
  * Response to a {@link ModifyPolicyImport} command.
+ *
+ * @since 2.1.0
  */
 @Immutable
 @JsonParsableCommandResponse(type = ModifyPolicyImportResponse.TYPE)
@@ -59,8 +61,8 @@ public final class ModifyPolicyImportResponse extends AbstractCommandResponse<Mo
             JsonFactory.newJsonValueFieldDefinition("policyImport", FieldType.REGULAR, JsonSchemaVersion.V_2);
 
     private final PolicyId policyId;
+    private final PolicyId importedPolicyId;
     @Nullable private final PolicyImport policyImportCreated;
-    @Nullable private final PolicyId importedPolicyIdCreated;
 
     private ModifyPolicyImportResponse(final PolicyId policyId,
             final HttpStatus statusCode,
@@ -69,9 +71,9 @@ public final class ModifyPolicyImportResponse extends AbstractCommandResponse<Mo
             final DittoHeaders dittoHeaders) {
 
         super(TYPE, statusCode, dittoHeaders);
-        this.policyId = checkNotNull(policyId, "Policy ID");
+        this.policyId = checkNotNull(policyId, "policyId");
         this.policyImportCreated = policyImportCreated;
-        this.importedPolicyIdCreated = importedPolicyId;
+        this.importedPolicyId = checkNotNull(importedPolicyId, "importedPolicyId");
     }
 
     /**
@@ -102,7 +104,8 @@ public final class ModifyPolicyImportResponse extends AbstractCommandResponse<Mo
      * @return the response.
      * @throws NullPointerException if {@code policyId} or {@code dittoHeaders} is {@code null}.
      */
-    public static ModifyPolicyImportResponse modified(final PolicyId policyId, @Nullable final PolicyId importedPolicyId,
+    public static ModifyPolicyImportResponse modified(final PolicyId policyId,
+            final PolicyId importedPolicyId,
             final DittoHeaders dittoHeaders) {
         return new ModifyPolicyImportResponse(policyId, HttpStatus.NO_CONTENT, null, importedPolicyId, dittoHeaders);
     }
@@ -145,9 +148,19 @@ public final class ModifyPolicyImportResponse extends AbstractCommandResponse<Mo
                             .orElse(null);
 
                     return new ModifyPolicyImportResponse(policyId, statusCode, extractedPolicyImportCreated,
-                        extractedPolicyImportCreated.getImportedPolicyId(),
-                        dittoHeaders);
+                            extractedPolicyImportCreated != null ? extractedPolicyImportCreated.getImportedPolicyId() :
+                                    null,
+                            dittoHeaders);
                 });
+    }
+
+    /**
+     * Returns the imported PolicyId.
+     *
+     * @return the imported PolicyId.
+     */
+    public PolicyId getImportedPolicyId() {
+        return importedPolicyId;
     }
 
     /**
@@ -181,15 +194,17 @@ public final class ModifyPolicyImportResponse extends AbstractCommandResponse<Mo
         final Predicate<JsonField> predicate = schemaVersion.and(thePredicate);
         jsonObjectBuilder.set(PolicyModifyCommandResponse.JsonFields.JSON_POLICY_ID, policyId.toString(), predicate);
         if (null != policyImportCreated) {
-            jsonObjectBuilder.set(JSON_IMPORTED_POLICY_ID, policyImportCreated.getImportedPolicyId().toString(), predicate);
-            jsonObjectBuilder.set(JSON_POLICY_IMPORT, policyImportCreated.toJson(schemaVersion, thePredicate), predicate);
+            jsonObjectBuilder.set(JSON_IMPORTED_POLICY_ID, policyImportCreated.getImportedPolicyId().toString(),
+                    predicate);
+            jsonObjectBuilder.set(JSON_POLICY_IMPORT, policyImportCreated.toJson(schemaVersion, thePredicate),
+                    predicate);
         }
     }
 
     @Override
     public ModifyPolicyImportResponse setDittoHeaders(final DittoHeaders dittoHeaders) {
         return (policyImportCreated != null) ? created(policyId, policyImportCreated, dittoHeaders) :
-                modified(policyId, null, dittoHeaders);
+                modified(policyId, importedPolicyId, dittoHeaders);
     }
 
     @Override
@@ -211,19 +226,25 @@ public final class ModifyPolicyImportResponse extends AbstractCommandResponse<Mo
             return false;
         }
         final ModifyPolicyImportResponse that = (ModifyPolicyImportResponse) o;
-        return that.canEqual(this) && Objects.equals(policyId, that.policyId)
-                && Objects.equals(policyImportCreated, that.policyImportCreated) && super.equals(o);
+        return that.canEqual(this) &&
+                Objects.equals(policyId, that.policyId) &&
+                Objects.equals(importedPolicyId, that.importedPolicyId) &&
+                Objects.equals(policyImportCreated, that.policyImportCreated) &&
+                super.equals(o);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), policyId, policyImportCreated);
+        return Objects.hash(super.hashCode(), policyId, importedPolicyId, policyImportCreated);
     }
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + " [" + super.toString() + ", policyId=" + policyId +
-                ", policyImportCreated=" + policyImportCreated + "]";
+        return getClass().getSimpleName() + " [" + super.toString() +
+                ", policyId=" + policyId +
+                ", importedPolicyId=" + importedPolicyId +
+                ", policyImportCreated=" + policyImportCreated +
+                "]";
     }
 
 }

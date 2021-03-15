@@ -23,11 +23,12 @@ import org.eclipse.ditto.signals.events.policies.PolicyImportModified;
 final class PolicyImportModifiedStrategy extends AbstractPolicyEventStrategy<PolicyImportModified> {
 
     @Override
-    protected PolicyBuilder applyEvent(final PolicyImportModified pim, final Policy policy, final PolicyBuilder policyBuilder) {
+    protected PolicyBuilder applyEvent(final PolicyImportModified pim, final Policy policy,
+            final PolicyBuilder policyBuilder) {
         return policyBuilder.setImports(
-            policy.getImports()
-                .map(policyImports -> policyImports.setPolicyImport(pim.getPolicyImport()))
-                .orElse(PolicyImports.newInstance(pim.getPolicyImport())));
+                policy.getImports()
+                        .map(policyImports -> policyImports.setPolicyImport(pim.getPolicyImport()))
+                        .orElse(PolicyImports.newInstance(pim.getPolicyImport())));
     }
 
 }

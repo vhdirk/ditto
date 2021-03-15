@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Contributors to the Eclipse Foundation
+ * Copyright (c) 2020 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -113,7 +113,7 @@ final class PolicyModifyCommandMappingStrategies extends AbstractPolicyMappingSt
 
         mappingStrategies.put(ModifyPolicyImports.TYPE,
                 adaptable -> ModifyPolicyImports.of(policyIdFromTopicPath(adaptable.getTopicPath()),
-                        policyImportsFrom(adaptable).orElse(null), dittoHeadersFrom(adaptable)));
+                        policyImportsFrom(adaptable), dittoHeadersFrom(adaptable)));
 
         mappingStrategies.put(ModifyPolicyImport.TYPE,
                 adaptable -> ModifyPolicyImport.of(policyIdFromTopicPath(adaptable.getTopicPath()),
