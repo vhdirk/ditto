@@ -51,7 +51,7 @@ final class ImmutablePolicyImport implements PolicyImport {
      * Creates a new {@code PolicyImport} object based on the given {@code importedPolicyId} with empty
      * {@code effectedImports}.
      *
-     * @param importedPolicyId TODO TJ doc
+     * @param importedPolicyId the {@code PolicyId} where entries will be imported from.
      * @param isProtected
      * @return a new {@code PolicyImport} object.
      * @throws NullPointerException if any argument is {@code null}.
@@ -64,9 +64,9 @@ final class ImmutablePolicyImport implements PolicyImport {
     /**
      * Creates a new {@code PolicyImport} object based on the given {@code importedPolicyId} and {@code effectedImports}.
      *
-     * @param importedPolicyId TODO TJ doc
+     * @param importedPolicyId the {@code PolicyId} where entries will be imported from.
      * @param isProtected
-     * @param effectedImports
+     * @param effectedImports lists every {@code PolicyEntry} from the imported {@code Policy} that will be either included or excluded
      * @return a new {@code PolicyImport} object.
      * @throws NullPointerException if any argument is {@code null}.
      */
@@ -78,7 +78,7 @@ final class ImmutablePolicyImport implements PolicyImport {
     /**
      * Creates a new {@code PolicyImport} object based on the given {@code importedPolicyId} and {@code jsonValue}.
      *
-     * @param importedPolicyId the JSON key which is assumed to be ... TODO TJ doc
+     * @param importedPolicyId  the {@code PolicyId} where entries will be imported from.
      * @param jsonValue the JSON value containing the effected permissions for the PolicyImport. This value is supposed to
      * be a {@link JsonObject}.
      * @return a new {@code PolicyImport} object.

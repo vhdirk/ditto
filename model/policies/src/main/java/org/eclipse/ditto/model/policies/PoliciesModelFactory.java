@@ -777,8 +777,8 @@ public final class PoliciesModelFactory {
     }
 
     /**
-     * TODO TJ doc
-     * @return
+     * Returns a new immutable instance of {@link ImportedLabels} containing no labels.
+     * @return the new {@code ImportedLabels}.
      */
     public static ImportedLabels noImportedEntries() {
         return ImmutableImportedLabels.none();
