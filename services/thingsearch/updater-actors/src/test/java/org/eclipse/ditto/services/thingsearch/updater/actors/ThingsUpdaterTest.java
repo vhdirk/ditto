@@ -158,7 +158,8 @@ public final class ThingsUpdaterTest {
 
     @Test
     public void shardRegionStateIsForwarded() {
-        final ShardRegion.GetShardRegionState$ shardRegionState = ShardRegion.getShardRegionStateInstance();
+        final ShardRegion.GetShardRegionState$ shardRegionState =
+                (ShardRegion.GetShardRegionState$) ShardRegion.getShardRegionStateInstance();
         new TestKit(actorSystem) {{
             final ActorRef underTest = createThingsUpdater();
             underTest.tell(shardRegionState, getRef());
