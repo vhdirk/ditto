@@ -32,8 +32,7 @@ import org.eclipse.ditto.signals.events.policies.PolicyEvent;
 /**
  * This strategy handles the {@link org.eclipse.ditto.signals.commands.policies.query.RetrievePolicyImport} command.
  */
-final class RetrievePolicyImportStrategy extends
-        AbstractPolicyQueryCommandStrategy<RetrievePolicyImport> {
+final class RetrievePolicyImportStrategy extends AbstractPolicyQueryCommandStrategy<RetrievePolicyImport> {
 
     RetrievePolicyImportStrategy(final PolicyConfig policyConfig) {
         super(RetrievePolicyImport.class, policyConfig);

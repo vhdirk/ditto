@@ -48,6 +48,7 @@ import org.eclipse.ditto.signals.commands.base.Command;
 import org.eclipse.ditto.signals.commands.policies.exceptions.PolicyEntryModificationInvalidException;
 import org.eclipse.ditto.signals.commands.policies.exceptions.PolicyEntryNotAccessibleException;
 import org.eclipse.ditto.signals.commands.policies.exceptions.PolicyImportNotAccessibleException;
+import org.eclipse.ditto.signals.commands.policies.exceptions.PolicyImportsNotAccessibleException;
 import org.eclipse.ditto.signals.commands.policies.exceptions.PolicyModificationInvalidException;
 import org.eclipse.ditto.signals.commands.policies.exceptions.PolicyNotAccessibleException;
 import org.eclipse.ditto.signals.commands.policies.exceptions.ResourceNotAccessibleException;
@@ -301,9 +302,17 @@ abstract class AbstractPolicyCommandStrategy<C extends Command<C>, E extends Pol
         return PolicyEntryNotAccessibleException.newBuilder(policyId, label).dittoHeaders(dittoHeaders).build();
     }
 
+    static DittoRuntimeException policyImportsNotFound(final PolicyId policyId, final DittoHeaders dittoHeaders) {
+        return PolicyImportsNotAccessibleException.newBuilder(policyId)
+                .dittoHeaders(dittoHeaders)
+                .build();
+    }
+
     static DittoRuntimeException policyImportNotFound(final PolicyId policyId, final PolicyId importedPolicyId,
             final DittoHeaders dittoHeaders) {
-        return PolicyImportNotAccessibleException.newBuilder(policyId, importedPolicyId).dittoHeaders(dittoHeaders).build();
+        return PolicyImportNotAccessibleException.newBuilder(policyId, importedPolicyId)
+                .dittoHeaders(dittoHeaders)
+                .build();
     }
 
     static DittoRuntimeException subjectNotFound(final PolicyId policyId, final Label label,

@@ -35,6 +35,7 @@ import org.eclipse.ditto.model.base.json.JsonSchemaVersion;
 import org.eclipse.ditto.model.policies.PoliciesModelFactory;
 import org.eclipse.ditto.model.policies.PolicyId;
 import org.eclipse.ditto.model.policies.PolicyImport;
+import org.eclipse.ditto.signals.base.FeatureToggle;
 import org.eclipse.ditto.signals.commands.base.AbstractCommand;
 import org.eclipse.ditto.signals.commands.base.CommandJsonDeserializer;
 import org.eclipse.ditto.signals.commands.policies.PolicyCommandSizeValidator;
@@ -70,7 +71,7 @@ public final class ModifyPolicyImport extends AbstractCommand<ModifyPolicyImport
 
     private ModifyPolicyImport(final PolicyId policyId, final PolicyImport policyImport,
             final DittoHeaders dittoHeaders) {
-        super(TYPE, dittoHeaders);
+        super(TYPE, FeatureToggle.checkPolicyImportsFeatureEnabled(TYPE, dittoHeaders));
         this.policyId = policyId;
         this.policyImport = policyImport;
 

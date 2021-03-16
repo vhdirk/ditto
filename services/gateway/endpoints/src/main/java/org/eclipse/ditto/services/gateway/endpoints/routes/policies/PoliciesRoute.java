@@ -67,8 +67,8 @@ public final class PoliciesRoute extends AbstractRoute {
     private static final String PATH_ACTIONS = "actions";
 
     private static final String PATH_POLICIES = "policies";
-    private static final String PATH_ENTRIES = "entries";
     private static final String PATH_IMPORTS = "imports";
+    private static final String PATH_ENTRIES = "entries";
 
     private static final Label DUMMY_LABEL = Label.of("-");
 
@@ -127,7 +127,7 @@ public final class PoliciesRoute extends AbstractRoute {
             final AuthenticationResult authenticationResult) {
         return concat(
                 policyId(ctx, dittoHeaders, policyId),
-                policyImports(ctx, dittoHeaders, policyId, authenticationResult),
+                policyImports(ctx, dittoHeaders, policyId),
                 policyEntries(ctx, dittoHeaders, policyId, authenticationResult),
                 policyActions(ctx, dittoHeaders, policyId, authenticationResult)
         );
@@ -174,6 +174,17 @@ public final class PoliciesRoute extends AbstractRoute {
     }
 
     /*
+     * Describes {@code /policies/<policyId>/imports} route.
+     *
+     * @return {@code /policies/<policyId>/imports} route.
+     */
+    private Route policyImports(final RequestContext ctx, final DittoHeaders dittoHeaders, final PolicyId policyId) {
+        return rawPathPrefix(PathMatchers.slash().concat(PATH_IMPORTS), () -> // /policies/<policyId>/imports
+                policyImportsRoute.buildPolicyImportsRoute(ctx, dittoHeaders, policyId)
+        );
+    }
+
+    /*
      * Describes {@code /policies/<policyId>/entries} route.
      *
      * @return {@code /policies/<policyId>/entries} route.
@@ -182,18 +193,6 @@ public final class PoliciesRoute extends AbstractRoute {
             final AuthenticationResult authResult) {
         return rawPathPrefix(PathMatchers.slash().concat(PATH_ENTRIES), () -> // /policies/<policyId>/entries
                 policyEntriesRoute.buildPolicyEntriesRoute(ctx, dittoHeaders, policyId, authResult)
-        );
-    }
-
-    /*
-     * Describes {@code /policies/<policyId>/imports} route.
-     *
-     * @return {@code /policies/<policyId>/imports} route.
-     */
-    private Route policyImports(final RequestContext ctx, final DittoHeaders dittoHeaders, final PolicyId policyId,
-            final AuthenticationResult authResult) {
-        return rawPathPrefix(PathMatchers.slash().concat(PATH_IMPORTS), () -> // /policies/<policyId>/imports
-                policyImportsRoute.buildPolicyImportsRoute(ctx, dittoHeaders, policyId, authResult)
         );
     }
 

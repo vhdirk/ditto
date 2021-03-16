@@ -31,6 +31,7 @@ import org.eclipse.ditto.model.base.json.FieldType;
 import org.eclipse.ditto.model.base.json.JsonParsableCommand;
 import org.eclipse.ditto.model.base.json.JsonSchemaVersion;
 import org.eclipse.ditto.model.policies.PolicyId;
+import org.eclipse.ditto.signals.base.FeatureToggle;
 import org.eclipse.ditto.signals.commands.base.AbstractCommand;
 import org.eclipse.ditto.signals.commands.base.CommandJsonDeserializer;
 
@@ -62,7 +63,7 @@ public final class DeletePolicyImport extends AbstractCommand<DeletePolicyImport
 
     private DeletePolicyImport(final PolicyId policyId, final PolicyId importedPolicyId,
             final DittoHeaders dittoHeaders) {
-        super(TYPE, dittoHeaders);
+        super(TYPE, FeatureToggle.checkPolicyImportsFeatureEnabled(TYPE, dittoHeaders));
         this.policyId = policyId;
         this.importedPolicyId = importedPolicyId;
     }

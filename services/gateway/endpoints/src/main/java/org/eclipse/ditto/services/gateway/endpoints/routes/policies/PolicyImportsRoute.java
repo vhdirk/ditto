@@ -18,19 +18,18 @@ import org.eclipse.ditto.json.JsonFactory;
 import org.eclipse.ditto.json.JsonObject;
 import org.eclipse.ditto.model.base.headers.DittoHeaders;
 import org.eclipse.ditto.model.policies.PoliciesModelFactory;
+import org.eclipse.ditto.model.policies.PolicyId;
 import org.eclipse.ditto.model.policies.PolicyImport;
 import org.eclipse.ditto.model.policies.PolicyImports;
-import org.eclipse.ditto.model.policies.PolicyId;
 import org.eclipse.ditto.protocoladapter.HeaderTranslator;
 import org.eclipse.ditto.services.gateway.endpoints.routes.AbstractRoute;
-import org.eclipse.ditto.services.gateway.security.authentication.AuthenticationResult;
 import org.eclipse.ditto.services.gateway.util.config.endpoints.CommandConfig;
 import org.eclipse.ditto.services.gateway.util.config.endpoints.HttpConfig;
 import org.eclipse.ditto.signals.commands.policies.modify.DeletePolicyImport;
-import org.eclipse.ditto.signals.commands.policies.modify.ModifyPolicyImports;
 import org.eclipse.ditto.signals.commands.policies.modify.ModifyPolicyImport;
-import org.eclipse.ditto.signals.commands.policies.query.RetrievePolicyImports;
+import org.eclipse.ditto.signals.commands.policies.modify.ModifyPolicyImports;
 import org.eclipse.ditto.signals.commands.policies.query.RetrievePolicyImport;
+import org.eclipse.ditto.signals.commands.policies.query.RetrievePolicyImports;
 
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
@@ -51,7 +50,6 @@ final class PolicyImportsRoute extends AbstractRoute {
      * @param httpConfig the configuration settings of the Gateway service's HTTP endpoint.
      * @param commandConfig the configuration settings of the Gateway service's incoming command processing.
      * @param headerTranslator translates headers from external sources or to external sources.
-     * @param tokenIntegrationSubjectIdFactory factory of token integration subject IDs.
      * @throws NullPointerException if any argument is {@code null}.
      */
     PolicyImportsRoute(final ActorRef proxyActor,
@@ -68,8 +66,7 @@ final class PolicyImportsRoute extends AbstractRoute {
      *
      * @return the {@code /imports} route.
      */
-    Route buildPolicyImportsRoute(final RequestContext ctx, final DittoHeaders dittoHeaders, final PolicyId policyId,
-            final AuthenticationResult authResult) {
+    Route buildPolicyImportsRoute(final RequestContext ctx, final DittoHeaders dittoHeaders, final PolicyId policyId) {
         return concat(
                 policyImports(ctx, dittoHeaders, policyId),
                 policyImport(ctx, dittoHeaders, policyId)

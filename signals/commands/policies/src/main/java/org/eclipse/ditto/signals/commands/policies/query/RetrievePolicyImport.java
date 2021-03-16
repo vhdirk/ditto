@@ -31,6 +31,7 @@ import org.eclipse.ditto.model.base.json.FieldType;
 import org.eclipse.ditto.model.base.json.JsonParsableCommand;
 import org.eclipse.ditto.model.base.json.JsonSchemaVersion;
 import org.eclipse.ditto.model.policies.PolicyId;
+import org.eclipse.ditto.signals.base.FeatureToggle;
 import org.eclipse.ditto.signals.commands.base.AbstractCommand;
 import org.eclipse.ditto.signals.commands.base.CommandJsonDeserializer;
 
@@ -63,7 +64,7 @@ public final class RetrievePolicyImport extends AbstractCommand<RetrievePolicyIm
 
     private RetrievePolicyImport(final PolicyId importedPolicyId, final PolicyId policyId,
             final DittoHeaders dittoHeaders) {
-        super(TYPE, dittoHeaders);
+        super(TYPE, FeatureToggle.checkPolicyImportsFeatureEnabled(TYPE, dittoHeaders));
         this.policyId = checkNotNull(policyId, "Policy identifier");
         this.importedPolicyId = checkNotNull(importedPolicyId, "Imported Policy ID");
     }

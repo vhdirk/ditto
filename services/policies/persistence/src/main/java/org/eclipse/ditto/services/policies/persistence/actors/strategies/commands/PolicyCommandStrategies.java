@@ -60,6 +60,7 @@ public final class PolicyCommandStrategies
         addStrategy(new DeactivateTokenIntegrationStrategy(policyConfig, system));
 
         // Policy Import
+        addStrategy(new ModifyPolicyImportsStrategy(policyConfig));
         addStrategy(new ModifyPolicyImportStrategy(policyConfig));
         addStrategy(new RetrievePolicyImportsStrategy(policyConfig));
         addStrategy(new RetrievePolicyImportStrategy(policyConfig));

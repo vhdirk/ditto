@@ -34,6 +34,7 @@ import org.eclipse.ditto.model.base.json.JsonSchemaVersion;
 import org.eclipse.ditto.model.policies.PoliciesModelFactory;
 import org.eclipse.ditto.model.policies.Policy;
 import org.eclipse.ditto.model.policies.PolicyId;
+import org.eclipse.ditto.signals.base.FeatureToggle;
 import org.eclipse.ditto.signals.commands.base.AbstractCommand;
 import org.eclipse.ditto.signals.commands.base.CommandJsonDeserializer;
 import org.eclipse.ditto.signals.commands.policies.PolicyCommandSizeValidator;
@@ -65,6 +66,11 @@ public final class ModifyPolicy extends AbstractCommand<ModifyPolicy> implements
         super(TYPE, dittoHeaders);
         this.policyId = policyId;
         this.policy = policy;
+
+        if (policy.getImports().isPresent()) {
+            FeatureToggle.checkPolicyImportsFeatureEnabled(TYPE, dittoHeaders,
+                    "Policy imports may not be used as part of a Policy.");
+        }
 
         final JsonObject policyJsonObject = policy.toJson();
 

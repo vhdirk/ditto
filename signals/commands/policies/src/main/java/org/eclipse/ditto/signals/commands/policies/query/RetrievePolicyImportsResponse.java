@@ -78,15 +78,11 @@ public final class RetrievePolicyImportsResponse extends AbstractCommandResponse
      * @return the response.
      * @throws NullPointerException if any argument is {@code null}.
      */
-    public static RetrievePolicyImportsResponse of(final PolicyId policyId, @Nullable final PolicyImports policyImports,
+    public static RetrievePolicyImportsResponse of(final PolicyId policyId, final PolicyImports policyImports,
             final DittoHeaders dittoHeaders) {
 
-        final JsonObject importsObject;
-        if (null != policyImports) {
-            importsObject = policyImports.toJson(dittoHeaders.getSchemaVersion().orElse(JsonSchemaVersion.LATEST));
-        } else {
-            importsObject = JsonFactory.newObject();
-        }
+        final JsonObject importsObject = policyImports.toJson(dittoHeaders.getSchemaVersion()
+                .orElse(JsonSchemaVersion.LATEST));
         return new RetrievePolicyImportsResponse(policyId, HttpStatus.OK, importsObject, dittoHeaders);
     }
 

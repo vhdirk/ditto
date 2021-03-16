@@ -27,6 +27,7 @@ import org.eclipse.ditto.model.base.headers.DittoHeaders;
 import org.eclipse.ditto.model.base.json.JsonParsableCommand;
 import org.eclipse.ditto.model.base.json.JsonSchemaVersion;
 import org.eclipse.ditto.model.policies.PolicyId;
+import org.eclipse.ditto.signals.base.FeatureToggle;
 import org.eclipse.ditto.signals.commands.base.AbstractCommand;
 import org.eclipse.ditto.signals.commands.base.CommandJsonDeserializer;
 
@@ -53,7 +54,7 @@ public final class RetrievePolicyImports extends AbstractCommand<RetrievePolicyI
     private final PolicyId policyId;
 
     private RetrievePolicyImports(final PolicyId policyId, final DittoHeaders dittoHeaders) {
-        super(TYPE, dittoHeaders);
+        super(TYPE, FeatureToggle.checkPolicyImportsFeatureEnabled(TYPE, dittoHeaders));
         this.policyId = policyId;
     }
 
