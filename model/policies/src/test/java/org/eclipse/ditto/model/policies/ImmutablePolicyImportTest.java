@@ -12,21 +12,14 @@
  */
 package org.eclipse.ditto.model.policies;
 
-import static org.eclipse.ditto.model.policies.TestConstants.Policy.PERMISSION_READ;
-import static org.eclipse.ditto.model.policies.TestConstants.Policy.PERMISSION_WRITE;
-import static org.eclipse.ditto.model.policies.TestConstants.Policy.RESOURCE_PATH;
-import static org.eclipse.ditto.model.policies.TestConstants.Policy.RESOURCE_TYPE;
-import static org.eclipse.ditto.model.policies.TestConstants.Policy.SUBJECT;
 import static org.eclipse.ditto.model.policies.assertions.DittoPolicyAssertions.assertThat;
 import static org.mutabilitydetector.unittesting.AllowedReason.provided;
 import static org.mutabilitydetector.unittesting.MutabilityAssert.assertInstancesOf;
 import static org.mutabilitydetector.unittesting.MutabilityMatchers.areImmutable;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
 
 import org.eclipse.ditto.json.JsonFactory;
-import org.eclipse.ditto.json.JsonFieldDefinition;
 import org.eclipse.ditto.json.JsonObject;
 import org.eclipse.ditto.model.base.exceptions.DittoJsonException;
 import org.eclipse.ditto.model.base.json.JsonSchemaVersion;
@@ -60,8 +53,8 @@ public final class ImmutablePolicyImportTest {
         final PolicyImport policyImport = ImmutablePolicyImport.of(IMPORTED_POLICY_ID,
                 false,
                 EffectedImports.newInstance(
-                        List.of("IncludedPolicyImport1, IncludedPolicyImport2"),
-                        List.of("ExcludedPolicyImport1, ExcludedPolicyImport2")));
+                        Arrays.asList("IncludedPolicyImport1, IncludedPolicyImport2"),
+                        Arrays.asList("ExcludedPolicyImport1, ExcludedPolicyImport2")));
 
         final JsonObject policyImportJson = policyImport.toJson();
         final PolicyImport policyImport1 = ImmutablePolicyImport.fromJson(policyImport.getImportedPolicyId(), policyImportJson);

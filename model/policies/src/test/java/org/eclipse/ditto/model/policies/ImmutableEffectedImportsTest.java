@@ -42,7 +42,7 @@ public final class ImmutableEffectedImportsTest {
     public void assertImmutability() {
         assertInstancesOf(ImmutableEffectedImports.class,
                 areImmutable(),
-                provided(Permissions.class).areAlsoImmutable());
+                provided(ImportedLabels.class).areAlsoImmutable());
     }
 
     @Test
