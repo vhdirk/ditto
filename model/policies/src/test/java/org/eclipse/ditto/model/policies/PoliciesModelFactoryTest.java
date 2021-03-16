@@ -20,7 +20,7 @@ import org.eclipse.ditto.model.base.entity.id.restriction.LengthRestrictionTestB
 import org.junit.Test;
 
 /**
- * Unit test for {@link PoliciesModelFactoryTest}.
+ * Unit test for {@link PoliciesModelFactory}.
  */
 public final class PoliciesModelFactoryTest extends LengthRestrictionTestBase {
 

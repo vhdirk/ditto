@@ -21,7 +21,7 @@ import static org.mutabilitydetector.unittesting.MutabilityMatchers.areImmutable
 import org.junit.Test;
 
 /**
- * Unit test for {@link PoliciesResourceTypeTest}.
+ * Unit test for {@link PoliciesResourceType}.
  */
 public final class PoliciesResourceTypeTest {
 
