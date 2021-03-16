@@ -44,7 +44,7 @@ final class ImmutablePolicyImport implements PolicyImport {
             final EffectedImports effectedPermissions) {
         this.importedPolicyId = checkNotNull(importedPolicyId, "importedPolicyId");
         this.isProtected = isProtected;
-        this.effectedImports = checkNotNull(effectedPermissions, "effectedPermissions");
+        this.effectedImports = checkNotNull(effectedPermissions, "effectedImports");
     }
 
     /**
