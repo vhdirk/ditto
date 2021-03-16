@@ -116,7 +116,7 @@ public final class DefaultEnforcerActorFactory implements EnforcerActorFactory<C
         policyCacheLoader.registerCacheInvalidator(policyCache::invalidate);
 
         final AsyncCacheLoader<EntityIdWithResourceType, Entry<PolicyEnforcer>> policyEnforcerCacheLoader =
-                new PolicyEnforcerCacheLoader(askTimeout, policiesShardRegionProxy);
+                new PolicyEnforcerCacheLoader(policyCache);
         final Cache<EntityIdWithResourceType, Entry<PolicyEnforcer>> policyEnforcerCache =
                 CacheFactory.createCache(policyEnforcerCacheLoader, cachesConfig.getEnforcerCacheConfig(),
                         ENFORCER_CACHE_METRIC_NAME_PREFIX + PolicyCommand.RESOURCE_TYPE,

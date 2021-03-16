@@ -154,7 +154,7 @@ public final class TestSetup {
             final PolicyCacheLoader policyCacheLoader = new PolicyCacheLoader(askTimeout, policiesShardRegion);
             final Cache<EntityIdWithResourceType, Entry<Policy>> policyCache = CaffeineCache.of(Caffeine.newBuilder(),
                     policyCacheLoader);
-            final PolicyEnforcerCacheLoader policyEnforcerCacheLoader = new PolicyEnforcerCacheLoader(askTimeout, policiesShardRegion);
+            final PolicyEnforcerCacheLoader policyEnforcerCacheLoader = new PolicyEnforcerCacheLoader(policyCache);
             final Cache<EntityIdWithResourceType, Entry<PolicyEnforcer>> policyEnforcerCache = CaffeineCache
                     .of(Caffeine.newBuilder(), policyEnforcerCacheLoader);
             final Cache<EntityIdWithResourceType, Entry<Enforcer>> projectedEnforcerCache = policyEnforcerCache

@@ -20,6 +20,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -189,4 +190,30 @@ final class ImmutablePermissions extends AbstractSet<String> implements Permissi
         throw new UnsupportedOperationException();
     }
 
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        if (!super.equals(o)) {
+            return false;
+        }
+        final ImmutablePermissions strings = (ImmutablePermissions) o;
+        return Objects.equals(permissions, strings.permissions);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), permissions);
+    }
+
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + " [" +
+                "permissions=" + permissions +
+                "]";
+    }
 }

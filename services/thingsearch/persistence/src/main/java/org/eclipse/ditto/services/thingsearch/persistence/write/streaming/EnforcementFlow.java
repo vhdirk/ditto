@@ -25,6 +25,7 @@ import org.eclipse.ditto.json.JsonRuntimeException;
 import org.eclipse.ditto.model.base.headers.DittoHeaders;
 import org.eclipse.ditto.model.enforcers.AclEnforcer;
 import org.eclipse.ditto.model.enforcers.Enforcer;
+import org.eclipse.ditto.model.policies.Policy;
 import org.eclipse.ditto.model.policies.PolicyId;
 import org.eclipse.ditto.model.policies.PolicyIdInvalidException;
 import org.eclipse.ditto.model.things.Thing;
@@ -42,6 +43,7 @@ import org.eclipse.ditto.services.utils.cache.Cache;
 import org.eclipse.ditto.services.utils.cache.CacheFactory;
 import org.eclipse.ditto.services.utils.cache.EntityIdWithResourceType;
 import org.eclipse.ditto.services.utils.cache.entry.Entry;
+import org.eclipse.ditto.services.utils.cacheloaders.PolicyCacheLoader;
 import org.eclipse.ditto.services.utils.cacheloaders.PolicyEnforcer;
 import org.eclipse.ditto.services.utils.cacheloaders.PolicyEnforcerCacheLoader;
 import org.eclipse.ditto.signals.commands.policies.PolicyCommand;
@@ -53,6 +55,7 @@ import com.github.benmanes.caffeine.cache.AsyncCacheLoader;
 
 import akka.NotUsed;
 import akka.actor.ActorRef;
+import akka.actor.ActorSystem;
 import akka.dispatch.MessageDispatcher;
 import akka.pattern.Patterns;
 import akka.stream.Attributes;
@@ -66,6 +69,7 @@ import akka.stream.javadsl.Source;
 final class EnforcementFlow {
 
     private static final Source<Entry<Enforcer>, NotUsed> ENFORCER_NONEXISTENT = Source.single(Entry.nonexistent());
+    private static final String POLICY_CACHE_METRIC_NAME_PREFIX = "ditto_authorization_policy_cache_";
 
     private final Logger log = LoggerFactory.getLogger(getClass());
     private final ActorRef thingsShardRegion;
@@ -90,13 +94,15 @@ final class EnforcementFlow {
     /**
      * Create an EnforcementFlow object.
      *
+     * @param actorSystem the actor system for looking up dispatchers.
      * @param updaterStreamConfig configuration of the updater stream.
      * @param thingsShardRegion the shard region to retrieve things from.
      * @param policiesShardRegion the shard region to retrieve policies from.
      * @param cacheDispatcher dispatcher for the enforcer cache.
      * @return an EnforcementFlow object.
      */
-    public static EnforcementFlow of(final StreamConfig updaterStreamConfig,
+    public static EnforcementFlow of(final ActorSystem actorSystem,
+            final StreamConfig updaterStreamConfig,
             final ActorRef thingsShardRegion,
             final ActorRef policiesShardRegion,
             final MessageDispatcher cacheDispatcher) {
@@ -104,12 +110,21 @@ final class EnforcementFlow {
         final Duration askTimeout = updaterStreamConfig.getAskTimeout();
         final StreamCacheConfig streamCacheConfig = updaterStreamConfig.getCacheConfig();
 
+        final PolicyCacheLoader policyCacheLoader = new PolicyCacheLoader(askTimeout, policiesShardRegion);
+        final Cache<EntityIdWithResourceType, Entry<Policy>> policyCache =
+                CacheFactory.createCache(policyCacheLoader, streamCacheConfig,
+                        POLICY_CACHE_METRIC_NAME_PREFIX + PolicyCommand.RESOURCE_TYPE,
+                        actorSystem.dispatchers().lookup("policy-cache-dispatcher"));
+        policyCache.subscribeForInvalidation(policyCacheLoader);
+        policyCacheLoader.registerCacheInvalidator(policyCache::invalidate);
+
         final AsyncCacheLoader<EntityIdWithResourceType, Entry<PolicyEnforcer>> policyEnforcerCacheLoader =
-                new PolicyEnforcerCacheLoader(askTimeout, policiesShardRegion);
+                new PolicyEnforcerCacheLoader(policyCache);
         final Cache<EntityIdWithResourceType, Entry<Enforcer>> policyEnforcerCache =
                 CacheFactory.createCache(policyEnforcerCacheLoader, streamCacheConfig,
                         EnforcementFlow.class.getCanonicalName() + ".cache", cacheDispatcher)
                         .projectValues(PolicyEnforcer::project, PolicyEnforcer::embed);
+        policyCacheLoader.registerCacheInvalidator(policyEnforcerCache::invalidate);
 
         return new EnforcementFlow(thingsShardRegion, policyEnforcerCache, askTimeout,
                 streamCacheConfig.getRetryDelay(), updaterStreamConfig.getMaxArraySize());

@@ -68,6 +68,21 @@ public final class PoliciesModelFactory {
     }
 
     /**
+     * Returns a {@link Label} for the given character sequence which is a label derived from a
+     * {@link org.eclipse.ditto.model.policies.PolicyImport}.
+     *
+     * @param labelValue the character sequence value of the Label to be created.
+     * @return a new Label with {@code labelValue} as its value.
+     * @throws NullPointerException if {@code labelValue} is {@code null}.
+     * @throws IllegalArgumentException if {@code labelValue} is empty.
+     * @throws LabelInvalidException if the {@code labelValue} can not be used to to blacklisted prefixes.
+     * @since 2.1.0
+     */
+    public static Label newImportedLabel(final CharSequence labelValue) {
+        return ImmutableImportedLabel.of(labelValue);
+    }
+
+    /**
      * Returns a new {@link SubjectIssuer} with the specified {@code subjectIssuer}.
      *
      * @param subjectIssuer the SubjectIssuer char sequence.

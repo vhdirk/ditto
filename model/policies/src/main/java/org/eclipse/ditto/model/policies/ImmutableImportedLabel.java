@@ -23,50 +23,27 @@ import org.eclipse.ditto.model.base.common.Validator;
 import org.eclipse.ditto.model.base.entity.validation.NoControlCharactersNoSlashesValidator;
 
 /**
- * An immutable implementation of {@link Label}.
+ * An immutable implementation of {@link Label} which was created by an imported policy.
  */
 @Immutable
-final class ImmutableLabel implements Label {
-
-    /**
-     * Prefix for Policy labels which were imported. As a consequence Policy entries may not start with the prefix.
-     */
-    static final String BLOCKLISTED_IMPORTED_PREFIX = "imported-";
+final class ImmutableImportedLabel implements Label {
 
     private final String labelValue;
 
-    private ImmutableLabel(final String theLabelValue) {
+    private ImmutableImportedLabel(final String theLabelValue) {
         labelValue = theLabelValue;
     }
 
     /**
-     * Returns a new Label based on the provided string.
+     * Returns a new Label based on the provided string, the label being treated as imported label.
      *
      * @param labelValue the character sequence forming the Label's value.
      * @return a new Label.
      * @throws NullPointerException if {@code labelValue} is {@code null}.
      * @throws IllegalArgumentException if {@code labelValue} is empty.
-     * @throws LabelInvalidException of the {@code labelValue} can not be used to to blacklisted prefixes.
      */
     public static Label of(final CharSequence labelValue) {
-        return of(labelValue, false);
-    }
-
-    /**
-     * Returns a new Label based on the provided string.
-     *
-     * @param labelValue the character sequence forming the Label's value.
-     * @param importedLabel whether the created label should be treated as imported label or not.
-     * @return a new Label.
-     * @throws NullPointerException if {@code labelValue} is {@code null}.
-     * @throws IllegalArgumentException if {@code labelValue} is empty.
-     * @throws LabelInvalidException of the {@code labelValue} can not be used to to blacklisted prefixes.
-     */
-    public static Label of(final CharSequence labelValue, final boolean importedLabel) {
         argumentNotEmpty(labelValue, "label value");
-        if (!importedLabel && labelValue.toString().startsWith(BLOCKLISTED_IMPORTED_PREFIX)) {
-            throw LabelInvalidException.newBuilder(labelValue).build();
-        }
 
         final Validator validator = NoControlCharactersNoSlashesValidator.getInstance(labelValue);
         if (!validator.isValid()) {
@@ -76,7 +53,7 @@ final class ImmutableLabel implements Label {
                     .build();
         }
 
-        return new ImmutableLabel(labelValue.toString());
+        return new ImmutableImportedLabel(labelValue.toString());
     }
 
     @Override
@@ -102,7 +79,7 @@ final class ImmutableLabel implements Label {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        final ImmutableLabel that = (ImmutableLabel) o;
+        final ImmutableImportedLabel that = (ImmutableImportedLabel) o;
         return Objects.equals(labelValue, that.labelValue);
     }
 

@@ -13,7 +13,6 @@
 package org.eclipse.ditto.model.policies;
 
 import static org.eclipse.ditto.model.policies.assertions.DittoPolicyAssertions.assertThat;
-import static org.mutabilitydetector.unittesting.AllowedReason.provided;
 import static org.mutabilitydetector.unittesting.MutabilityAssert.assertInstancesOf;
 import static org.mutabilitydetector.unittesting.MutabilityMatchers.areImmutable;
 
@@ -31,8 +30,7 @@ public final class ImmutableImportedLabelsTest {
     @Test
     public void assertImmutability() {
         assertInstancesOf(ImmutableImportedLabels.class,
-                areImmutable(),
-                provided(Permissions.class).areAlsoImmutable());
+                areImmutable());
     }
 
     @Test

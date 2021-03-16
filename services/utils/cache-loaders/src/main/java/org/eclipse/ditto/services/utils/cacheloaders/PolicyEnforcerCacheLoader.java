@@ -12,31 +12,27 @@
  */
 package org.eclipse.ditto.services.utils.cacheloaders;
 
-import static java.util.Objects.requireNonNull;
+import static org.eclipse.ditto.model.base.common.ConditionChecker.checkNotNull;
 
-import java.time.Duration;
+import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
-import java.util.function.BiFunction;
 
-import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
 
-import org.eclipse.ditto.model.base.entity.id.EntityId;
 import org.eclipse.ditto.model.enforcers.PolicyEnforcers;
 import org.eclipse.ditto.model.policies.Policy;
+import org.eclipse.ditto.model.policies.PolicyEntry;
+import org.eclipse.ditto.model.policies.PolicyId;
+import org.eclipse.ditto.model.policies.PolicyImportHelper;
 import org.eclipse.ditto.model.policies.PolicyRevision;
-import org.eclipse.ditto.services.models.policies.commands.sudo.SudoRetrievePolicyResponse;
-import org.eclipse.ditto.services.utils.cache.CacheLookupContext;
+import org.eclipse.ditto.services.utils.cache.Cache;
 import org.eclipse.ditto.services.utils.cache.EntityIdWithResourceType;
 import org.eclipse.ditto.services.utils.cache.entry.Entry;
-import org.eclipse.ditto.signals.commands.base.Command;
 import org.eclipse.ditto.signals.commands.policies.PolicyCommand;
-import org.eclipse.ditto.signals.commands.policies.exceptions.PolicyNotAccessibleException;
 
 import com.github.benmanes.caffeine.cache.AsyncCacheLoader;
-
-import akka.actor.ActorRef;
 
 /**
  * Loads a policy-enforcer by asking the policies shard-region-proxy.
@@ -45,46 +41,44 @@ import akka.actor.ActorRef;
 public final class PolicyEnforcerCacheLoader implements AsyncCacheLoader<EntityIdWithResourceType,
         Entry<PolicyEnforcer>> {
 
-    private final ActorAskCacheLoader<PolicyEnforcer, Command<?>> delegate;
+    private final Cache<EntityIdWithResourceType, Entry<Policy>> policyCache;
 
     /**
      * Constructor.
      *
-     * @param askTimeout the ask-timeout for communicating with the shard-region-proxy.
-     * @param policiesShardRegionProxy the shard-region-proxy.
+     * @param policyCache policy cache to load policies from.
      */
-    public PolicyEnforcerCacheLoader(final Duration askTimeout, final ActorRef policiesShardRegionProxy) {
-        requireNonNull(askTimeout);
-        requireNonNull(policiesShardRegionProxy);
-
-        final BiFunction<EntityId, CacheLookupContext, Command<?>> commandCreator =
-                PolicyCommandFactory::sudoRetrievePolicy;
-        final BiFunction<Object, CacheLookupContext, Entry<PolicyEnforcer>> responseTransformer =
-                PolicyEnforcerCacheLoader::handleSudoRetrievePolicyResponse;
-
-        delegate = ActorAskCacheLoader.forShard(askTimeout, PolicyCommand.RESOURCE_TYPE, policiesShardRegionProxy,
-                commandCreator, responseTransformer);
+    public PolicyEnforcerCacheLoader(final Cache<EntityIdWithResourceType, Entry<Policy>> policyCache) {
+        this.policyCache = checkNotNull(policyCache, "policyCache");
     }
 
     @Override
     public CompletableFuture<Entry<PolicyEnforcer>> asyncLoad(final EntityIdWithResourceType key,
             final Executor executor) {
-        return delegate.asyncLoad(key, executor);
+        return policyCache.get(key)
+                .thenApply(optionalPolicyEntry -> optionalPolicyEntry
+                        .filter(Entry::exists)
+                        .map(entry -> {
+                            final Policy initialPolicy = entry.getValueOrThrow();
+                            final Set<PolicyEntry> mergedPolicyEntriesSet =
+                                    PolicyImportHelper.mergeImportedPolicyEntries(initialPolicy,
+                                            this::policyLoader);
+                            final Policy mergedPolicy = initialPolicy.toBuilder()
+                                    .setAll(mergedPolicyEntriesSet)
+                                    .build();
+                            final long revision = initialPolicy.getRevision().map(PolicyRevision::toLong)
+                                    .orElseThrow(() -> new IllegalStateException("Bad loaded Policy: no revision"));
+                            return Entry.of(revision, PolicyEnforcer.of(mergedPolicy,
+                                    PolicyEnforcers.defaultEvaluator(mergedPolicyEntriesSet)));
+                        })
+                        .orElse(Entry.nonexistent())
+                );
     }
 
-    private static Entry<PolicyEnforcer> handleSudoRetrievePolicyResponse(final Object response,
-            @Nullable final CacheLookupContext cacheLookupContext) {
-        if (response instanceof SudoRetrievePolicyResponse) {
-            final SudoRetrievePolicyResponse sudoRetrievePolicyResponse = (SudoRetrievePolicyResponse) response;
-            final Policy policy = sudoRetrievePolicyResponse.getPolicy();
-            final long revision = policy.getRevision().map(PolicyRevision::toLong)
-                    .orElseThrow(() -> new IllegalStateException("Bad SudoRetrievePolicyResponse: no revision"));
-            return Entry.of(revision, PolicyEnforcer.of(policy, PolicyEnforcers.defaultEvaluator(policy)));
-        } else if (response instanceof PolicyNotAccessibleException) {
-            return Entry.nonexistent();
-        } else {
-            throw new IllegalStateException("expect SudoRetrievePolicyResponse, got: " + response);
-        }
+    private Optional<Policy> policyLoader(final PolicyId policyId) {
+        return policyCache.getBlocking(EntityIdWithResourceType.of(PolicyCommand.RESOURCE_TYPE, policyId))
+                .filter(Entry::exists)
+                .map(Entry::getValueOrThrow);
     }
 
 }

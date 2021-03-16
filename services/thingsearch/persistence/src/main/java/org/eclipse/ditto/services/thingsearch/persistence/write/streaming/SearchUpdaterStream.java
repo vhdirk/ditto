@@ -99,7 +99,7 @@ public final class SearchUpdaterStream {
         final MessageDispatcher messageDispatcher = actorSystem.dispatchers().lookup(dispatcherName);
 
         final EnforcementFlow enforcementFlow =
-                EnforcementFlow.of(streamConfig, thingsShard, policiesShard, messageDispatcher);
+                EnforcementFlow.of(actorSystem, streamConfig, thingsShard, policiesShard, messageDispatcher);
 
         final MongoSearchUpdaterFlow mongoSearchUpdaterFlow = MongoSearchUpdaterFlow.of(database,
                 streamConfig.getPersistenceConfig());
